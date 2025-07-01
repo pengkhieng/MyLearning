@@ -180,4 +180,12 @@ react-native doctor                   # Diagnose setup issues
 
 ---
 
+```powershell
+node --version && java --version
+ = > v20.19.3
+ = > openjdk 17.0.14 2025-01-21
+ = > OpenJDK Runtime Environment Homebrew (build 17.0.14+0)
+ = > OpenJDK 64-Bit Server VM Homebrew (build 17.0.14+0, mixed mode, sharing)
+```
+
 > 📌 **Tip:** Always make sure your environment is correctly set up for Android and iOS development. Use `npx react-native doctor` to verify.
