@@ -95,3 +95,89 @@ To learn more about React Native, take a look at the following resources:
 - [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
 - [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
 - [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+
+---
+
+# 📱 React Native CLI Quick Guide
+
+A handy guide for getting started and managing your React Native projects using the CLI.
+
+---
+
+## ✅ Check React Native CLI Version
+
+```powershell
+npx react-native --version
+```
+
+---
+
+## ✅ Create a New Project
+
+```powershell
+npx @react-native-community/cli init MyLearning
+```
+
+---
+
+## ✅ Run the App
+
+```powershell
+cd MyLearning
+npx react-native run-ios      # For iOS (macOS only)
+npx react-native run-android  # For Android
+```
+
+---
+
+## ✅ Doctor - Diagnose Your Environment
+
+```powershell
+npx react-native doctor
+```
+
+---
+
+## ✅ Update and Reinstall CocoaPods (iOS)
+
+```powershell
+cd ios
+pod install --repo-update
+cd ..
+```
+
+---
+
+## ✅ Use a Different Port (if 8081 is in use)
+
+```powershell
+npx react-native run-ios --port=8088
+```
+
+---
+
+## ✅ Restart Metro Bundler (Clear Cache)
+
+```powershell
+npx react-native start --reset-cache
+```
+
+---
+
+## 🔁 Basic & Useful CLI Commands
+
+```powershell
+react-native init MyApp               # Create a new project
+npx react-native run-android          # Build & run on Android
+npx react-native run-ios              # Build & run on iOS
+npx react-native start                # Launch Metro bundler
+npx react-native bundle               # Generate production JS bundle
+react-native link                     # Link native dependencies
+react-native upgrade                  # Upgrade React Native version
+react-native info                     # Show environment info
+react-native doctor                   # Diagnose setup issues
+```
+
+---
+
+> 📌 **Tip:** Always make sure your environment is correctly set up for Android and iOS development. Use `npx react-native doctor` to verify.
