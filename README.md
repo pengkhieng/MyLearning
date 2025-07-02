@@ -111,4 +111,31 @@ node --version && java --version
  = > OpenJDK 64-Bit Server VM Homebrew (build 17.0.14+0, mixed mode, sharing)
 ```
 
+
+
+##  React Native Environment Check
+```powershell
+npx react-native doctor
+
+Common
+ ✅ Node.js - Required to execute JavaScript code
+ ✅ npm - Required to install NPM dependencies
+ ✅ Watchman - Used for watching changes in the filesystem when in development mode
+ ✅ Metro - Required for bundling the JavaScript code
+
+Android
+ ✅ Adb - Required to verify if the android device is attached correctly
+ ✅ JDK - Required to compile Java code
+ ✅ Android Studio - Required for building and installing your app on Android
+ ✅ ANDROID_HOME - Environment variable that points to your Android SDK installation
+ ✅ Gradlew - Build tool required for Android builds
+ ✅ Android SDK - Required for building and installing your app on Android
+
+iOS
+ ✅ Xcode - Required for building and installing your app on iOS
+ ✅ Ruby - Required for installing iOS dependencies
+ ✅ CocoaPods - Required for installing iOS dependencies
+ ✅ .xcode.env - File to customize Xcode environment
+```
+
 > 📌 **Tip:** Always make sure your environment is correctly set up for Android and iOS development. Use `npx react-native doctor` to verify.
