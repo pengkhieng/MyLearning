@@ -101,6 +101,12 @@ npx pod-install
 ```
 
 
+
+### TypeScript Setup
+```powershell
+npm install --save-dev typescript @types/react @types/react-native
+```
+
 ---
 
 ```powershell

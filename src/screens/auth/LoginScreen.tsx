@@ -17,8 +17,10 @@ import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
+import { globalStyles } from '../../style/globalStyles';
 
-type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+
+type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
 
 const LoginScreen = () => {
   const [username, setUsername] = useState('khieng11');
@@ -63,9 +65,9 @@ const LoginScreen = () => {
   return (
     <LinearGradient
       colors={['#6B7280', '#3B82F6', '#1E3A8A']}
-      style={styles.container}
+      style={globalStyles.container}
     >
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={globalStyles.safeArea}>
         <StatusBar barStyle="light-content" />
         <KeyboardAvoidingView
           style={styles.keyboardAvoidingContainer}
@@ -133,12 +135,6 @@ const LoginScreen = () => {
 export default LoginScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  safeArea: {
-    flex: 1,
-  },
   keyboardAvoidingContainer: {
     flex: 1,
   },

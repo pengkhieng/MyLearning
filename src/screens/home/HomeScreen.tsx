@@ -1,9 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, StatusBar } from 'react-native';
 
+
+import { globalStyles } from '../../style/globalStyles';
+
 const HomeScreen = () => {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={globalStyles.container}>
       <StatusBar barStyle="dark-content" />
       <View style={styles.content}>
         <Text style={styles.title}>Welcome to My App 👋</Text>
@@ -16,10 +19,6 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f8f8',
-  },
   content: {
     marginTop: 50,
     paddingHorizontal: 20,
