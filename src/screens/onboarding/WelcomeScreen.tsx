@@ -1,21 +1,16 @@
-import React, { useRef } from "react";
+import React from "react";
 import { SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, Animated, View } from "react-native";
 import LinearGradient from 'react-native-linear-gradient';
-
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
-
 import { globalStyles } from '../../style/globalStyles';
 import { Image } from "react-native";
-
 import { colors } from '../../utils/colors'
-
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
 
 const WelcomeScreen = () => {
-    const buttonScale = useRef(new Animated.Value(1)).current;
 
     const navigation = useNavigation<LoginScreenNavigationProp>();
 
@@ -38,7 +33,7 @@ const WelcomeScreen = () => {
                 <StatusBar
                     backgroundColor="transparent"
                     translucent
-                    barStyle="dark-content" 
+                    barStyle="dark-content"
                 />
                 {/* Centered content container */}
                 <View style={styles.contentContainer}>
@@ -55,9 +50,9 @@ const WelcomeScreen = () => {
                 <TouchableOpacity
                     activeOpacity={0.8}
                     onPress={handlePress}
-                    style={[globalStyles.buttonContainer, {paddingHorizontal: 20} ]}
+                    style={[globalStyles.buttonContainer, { paddingHorizontal: 20 }]}
                 >
-                    <Animated.View style={[globalStyles.button, { transform: [{ scale: buttonScale }] },{marginBottom: 20}]}>
+                    <Animated.View style={[globalStyles.button, { marginBottom: 20 }]}>
                         <LinearGradient
                             colors={[colors.button.start, colors.button.end]}
                             style={globalStyles.buttonGradient}

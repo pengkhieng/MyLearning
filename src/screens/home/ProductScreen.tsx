@@ -1,8 +1,6 @@
 import React from "react";
-
 import { SafeAreaView, StatusBar, View, Text, StyleSheet } from 'react-native'
 import { globalStyles } from "../../style/globalStyles";
-
 
 const ProductScreen = () => {
     return (

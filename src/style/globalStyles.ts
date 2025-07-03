@@ -41,9 +41,9 @@ export const globalStyles = StyleSheet.create({
     },
     input: {
         height: 50,
-        fontSize: 17,
+        fontSize: 14,
         color: '#000',
-        fontWeight: "600",
+        fontWeight: "500",
         borderRadius: 10,
         fontFamily: 'System',
         letterSpacing: 1,

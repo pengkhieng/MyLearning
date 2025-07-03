@@ -4,12 +4,9 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { globalStyles } from "../../style/globalStyles";
 import { RootStackParamList } from "../../navigation/AppNavigator";
-
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 import { colors } from '../../utils/colors'
-
-
 
 type SettingScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setting'>;
 
@@ -53,7 +50,7 @@ const SettingScreen = () => {
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleLogout}
-          style={[globalStyles.buttonContainer,{paddingTop: 20, paddingHorizontal: 20}]}
+          style={[globalStyles.buttonContainer, { paddingTop: 20, paddingHorizontal: 20 }]}
         >
           <Animated.View style={[globalStyles.button, { transform: [{ scale: buttonScale }] }]}>
             <LinearGradient
@@ -66,7 +63,7 @@ const SettingScreen = () => {
             </LinearGradient>
           </Animated.View>
         </TouchableOpacity>
-        <View style={{flex:1}}/>
+        <View style={{ flex: 1 }} />
       </View>
     </SafeAreaView>
   );

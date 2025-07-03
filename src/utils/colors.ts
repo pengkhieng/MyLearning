@@ -21,8 +21,11 @@ export const colors = {
     title:      '#FFFFFF',
     text:       '#FFFFFF',
 
-    placeholderTxt: '#A0A0A0', 
-    orangeWithOpacity: 'rgba(249, 116, 22, 0.79)',
+    placeholderTxt:     'gray', 
+    orangeWithOpacity:  'rgba(249, 116, 22, 0.79)',
+    customBlue:         '#13B0E5',
+    customGreen:        '#21C997',
+    customDarkBlue:     '#006BA5',
 
 } as const;
 

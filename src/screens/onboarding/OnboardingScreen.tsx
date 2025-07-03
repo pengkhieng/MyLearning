@@ -4,11 +4,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
-
-
-
 import { globalStyles } from "../../style/globalStyles";
-
 import { colors } from '../../utils/colors'
 
 const onboardingData = [
@@ -32,10 +28,8 @@ type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, '
 
 const OnboardingScreen = () => {
     const navigation = useNavigation<LoginScreenNavigationProp>();
-
     const [currentScreen, setCurrentScreen] = useState(0);
     const buttonScale = new Animated.Value(1);
-    const isDisabled = currentScreen >= onboardingData.length;
 
     const handleNext = () => {
         if (currentScreen < onboardingData.length - 1) {
@@ -52,8 +46,6 @@ const OnboardingScreen = () => {
     };
 
     const handleSkip = () => {
-        // Skip to the end or main app
-        console.log('Skipped onboarding');
         navigation.replace('Login')
     };
 
@@ -120,7 +112,6 @@ const OnboardingScreen = () => {
                         activeOpacity={0.8}
                         onPress={handleNext}
                         style={styles.nextButton}
-                        disabled={isDisabled}
                     >
                         <Animated.View style={[styles.button, { transform: [{ scale: buttonScale }] }]}>
                             <LinearGradient
@@ -232,26 +223,25 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 20,
-      },
-      backButton: {
+    },
+    backButton: {
         flex: 1,
         paddingVertical: 15,
         backgroundColor: '#E5E7EB',
         borderRadius: 10,
         alignItems: 'center',
         marginRight: 10
-      },
-      backButtonText: {
+    },
+    backButtonText: {
         fontSize: 16,
         color: '#1F2937',
         fontWeight: '600',
-      },
-      nextButton: {
+    },
+    nextButton: {
         flex: 1,
-      },
-      button: {
+    },
+    button: {
         borderRadius: 10,
         overflow: 'hidden',
-      },
-
+    },
 });

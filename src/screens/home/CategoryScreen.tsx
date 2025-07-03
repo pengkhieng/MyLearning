@@ -1,7 +1,5 @@
 import React from "react";
-
 import { SafeAreaView, StatusBar, View, Text, StyleSheet } from 'react-native'
-
 import { globalStyles } from "../../style/globalStyles";
 
 const CategoryScreen = () => {
@@ -17,7 +15,6 @@ const CategoryScreen = () => {
 };
 
 export default CategoryScreen;
-
 
 const styles = StyleSheet.create({
     title: {
