@@ -1,7 +1,9 @@
 import { StyleSheet, Platform } from 'react-native';
 
 export const globalStyles = StyleSheet.create({
-
+    paddingTop:{
+        marginTop: Platform.OS === 'android' ? 40 : 0,
+    },
     paddingStatusBar: {
         marginTop: Platform.OS === 'android' ? 40 : 0,
         paddingHorizontal: 16,

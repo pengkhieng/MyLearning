@@ -30,7 +30,7 @@ const SettingScreen = () => {
   return (
     <SafeAreaView style={globalStyles.safeArea}>
       <StatusBar barStyle="dark-content" />
-      <View style={[globalStyles.bodyContain]}>
+      <View style={[globalStyles.bodyContain,globalStyles.paddingTop]}>
         <View style={styles.profile}>
           <Ionicons name="person-circle-outline" size={80} color="#4CAF50" />
           <Text style={styles.profileName}>Khieng11</Text>

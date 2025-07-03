@@ -57,7 +57,7 @@ const OnboardingScreen = () => {
     return (
         <SafeAreaView style={globalStyles.safeArea}>
             <StatusBar barStyle="dark-content" />
-            <View style={globalStyles.container}>
+            <View style={[globalStyles.container,globalStyles.paddingTop]}>
                 <View style={styles.contain_image}>
                     <Image
                         source={require('../../assets/images/image_trip.png')}
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 40,
     },
     backButton: {
         flex: 1,
