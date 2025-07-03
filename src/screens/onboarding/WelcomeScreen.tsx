@@ -34,11 +34,11 @@ const WelcomeScreen = () => {
             ]}
             style={globalStyles.container}
         >
-            <SafeAreaView style={globalStyles.safeArea}>
+            <SafeAreaView style={globalStyles.container}>
                 <StatusBar
                     backgroundColor="transparent"
                     translucent
-                    barStyle="dark-content" // Use 'dark-content' if background is light
+                    barStyle="dark-content" 
                 />
                 {/* Centered content container */}
                 <View style={styles.contentContainer}>
@@ -46,24 +46,23 @@ const WelcomeScreen = () => {
                         style={{ width: '70%' }} resizeMode="contain" />
                     <Text style={{ fontSize: 60, marginTop: 60 }}>👋</Text>
                     <Text style={styles.title}>Welcome</Text>
-                    <Text style={styles.title}>to our WanderWise trip</Text>
-                    <Text style={styles.subtitle}>Manage your products in as fast as one hour</Text>
+                    <Text style={styles.title}>to Your WanderWise Trip</Text>
+                    <Text style={styles.subtitle}>Manage your plans in as little as a short time</Text>
                 </View>
-
                 {/* Spacer to push button to bottom */}
                 <View style={styles.spacer} />
 
                 <TouchableOpacity
                     activeOpacity={0.8}
                     onPress={handlePress}
-                    style={styles.buttonContainer}
+                    style={[globalStyles.buttonContainer, globalStyles.paddingBody ]}
                 >
-                    <Animated.View style={[styles.button, { transform: [{ scale: buttonScale }] }]}>
+                    <Animated.View style={[globalStyles.button, { transform: [{ scale: buttonScale }] },{marginBottom: 20}]}>
                         <LinearGradient
                             colors={[colors.button.start, colors.button.end]}
-                            style={styles.buttonGradient}
+                            style={globalStyles.buttonGradient}
                         >
-                            <Text style={styles.buttonText}>Get Started</Text>
+                            <Text style={globalStyles.buttonText}>Get Started</Text>
                         </LinearGradient>
                     </Animated.View>
                 </TouchableOpacity>
@@ -81,8 +80,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     title: {
-        fontSize: 32,
-        fontWeight: '700',
+        fontSize: 26,
+        fontWeight: '600',
         color: '#FFFFFF',
         marginBottom: 10,
         textAlign: 'center',
@@ -97,25 +96,5 @@ const styles = StyleSheet.create({
     },
     spacer: {
         flex: 0,
-    },
-    buttonContainer: {
-        width: '90%',
-        marginBottom: 40,
-        alignSelf: 'center',
-    },
-    button: {
-        borderRadius: 10,
-        overflow: 'hidden',
-    },
-    buttonGradient: {
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    buttonText: {
-        color: '#FFFFFF',
-        fontSize: 18,
-        fontWeight: '600',
-        fontFamily: 'System',
-        paddingVertical: 15,
     },
 });

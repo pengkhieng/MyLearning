@@ -63,7 +63,7 @@ const OnboardingScreen = () => {
     const isLastScreen = currentScreen === onboardingData.length - 1;
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView style={globalStyles.safeArea}>
             <StatusBar barStyle="dark-content" />
             <View style={globalStyles.container}>
                 <View style={styles.contain_image}>
@@ -125,9 +125,9 @@ const OnboardingScreen = () => {
                         <Animated.View style={[styles.button, { transform: [{ scale: buttonScale }] }]}>
                             <LinearGradient
                                 colors={[colors.button.start, colors.button.end]
-                                } style={styles.buttonGradient}
+                                } style={globalStyles.buttonGradient}
                             >
-                                <Text style={styles.buttonText}>{isLastScreen ? 'Finish' : 'Next'}</Text>
+                                <Text style={globalStyles.buttonText}>{isLastScreen ? 'Finish' : 'Next'}</Text>
                             </LinearGradient>
                         </Animated.View>
                     </TouchableOpacity>
@@ -140,10 +140,7 @@ const OnboardingScreen = () => {
 export default OnboardingScreen;
 
 const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: 'white',
-    },
+
     contain_image: {
         flex: 0,
         justifyContent: 'center',
@@ -237,7 +234,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
       },
       backButton: {
-        flex: 0.8,
+        flex: 1,
         paddingVertical: 15,
         backgroundColor: '#E5E7EB',
         borderRadius: 10,
@@ -256,13 +253,5 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         overflow: 'hidden',
       },
-      buttonGradient: {
-        alignItems: 'center',
-      },
-      buttonText: {
-        fontSize: 16,
-        color: '#FFFFFF',
-        fontWeight: '600',
-        paddingVertical: 16,
-      },
+
 });

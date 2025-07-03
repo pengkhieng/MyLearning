@@ -4,14 +4,27 @@ export const globalStyles = StyleSheet.create({
 
     paddingStatusBar: {
         marginTop: Platform.OS === 'android' ? 40 : 0,
-        paddingHorizontal: 16
+        paddingHorizontal: 16,
+        paddingBottom: 0,
+        marginBottom: 0
+    },
+    paddingBody: {
+        paddingHorizontal: 16,
+        paddingBottom: 0,
+        marginBottom: 0
     },
     container: {
         flex: 1,
     },
     safeArea: {
         flex: 1,
-        width: '100%',
+        backgroundColor: 'white'
+    },
+    bodyContain: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingBottom: 50,
     },
     inputContainer: {
         marginBottom: 24,
@@ -23,7 +36,7 @@ export const globalStyles = StyleSheet.create({
         shadowRadius: 8,
         elevation: 0,
         borderWidth: 2,
-        borderColor: 'rgba(145, 99, 99, 0.25)', 
+        borderColor: 'rgba(145, 99, 99, 0.25)',
         paddingHorizontal: 16
     },
     input: {
@@ -50,4 +63,27 @@ export const globalStyles = StyleSheet.create({
         justifyContent: 'center',
         paddingBottom: 20,
     },
+
+    // BUTTON
+    button: {
+        borderRadius: 10,
+        overflow: 'hidden',
+    },
+    buttonContainer: {
+        width: '100%',
+        marginBottom: 20,
+        alignSelf: 'center',
+    },
+    buttonGradient: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    buttonText: {
+        color: '#FFFFFF',
+        fontSize: 18,
+        fontWeight: '600',
+        fontFamily: 'System',
+        paddingVertical: 16,
+    },
+
 });

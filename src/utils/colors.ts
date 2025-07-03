@@ -10,12 +10,19 @@ export const colors = {
         disabledStart:  'rgba(156, 163, 175, 0.4)',
         disabledEnd:    'rgba(107, 114, 128, 0.4)',
     },
+    buttonRed: {
+        start:         '#FB5012',
+        end:           '#DC2626',
+        disabledStart: 'rgba(156, 163, 175, 0.4)',
+        disabledEnd:   'rgba(107, 114, 128, 0.4)',
+    },
     primary:    '#6200EE',
     secondary:  '#6B7280',
     title:      '#FFFFFF',
     text:       '#FFFFFF',
 
     placeholderTxt: '#A0A0A0', 
+    orangeWithOpacity: 'rgba(249, 116, 22, 0.79)',
 
 } as const;
 

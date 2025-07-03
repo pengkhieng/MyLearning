@@ -8,7 +8,7 @@ const HomeScreen = () => {
   return (
     <SafeAreaView style={globalStyles.container}>
       <StatusBar barStyle="dark-content" />
-      <View style={styles.content}>
+      <View style={[globalStyles.paddingStatusBar, globalStyles.bodyContain]}>
         <Text style={styles.title}>Welcome to My App 👋</Text>
         <Text style={styles.subtitle}>This is the Home Screen</Text>
       </View>
@@ -19,10 +19,6 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  content: {
-    marginTop: 50,
-    paddingHorizontal: 20,
-  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',

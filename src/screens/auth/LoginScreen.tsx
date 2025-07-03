@@ -74,7 +74,7 @@ const LoginScreen = () => {
       ]}
       style={globalStyles.container}
     >
-      <SafeAreaView style={globalStyles.safeArea}>
+      <SafeAreaView style={{flex: 1}}>
         <StatusBar barStyle="dark-content" />
         <KeyboardAvoidingView
           style={styles.keyboardAvoidingContainer}

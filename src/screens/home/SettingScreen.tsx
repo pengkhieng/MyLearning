@@ -1,13 +1,20 @@
-import React from "react";
-import { SafeAreaView, StatusBar, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useRef } from "react";
+import { SafeAreaView, StatusBar, View, Text, TouchableOpacity, StyleSheet, Animated, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { globalStyles } from "../../style/globalStyles";
 import { RootStackParamList } from "../../navigation/AppNavigator";
+import LinearGradient from 'react-native-linear-gradient';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+
+import { colors } from '../../utils/colors'
 
 type SettingScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setting'>;
 
 const SettingScreen = () => {
+  const buttonScale = useRef(new Animated.Value(1)).current;
+
   const navigation = useNavigation<SettingScreenNavigationProp>();
 
   const handleLogout = () => {
@@ -15,17 +22,31 @@ const SettingScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={globalStyles.safeArea}>
       <StatusBar barStyle="dark-content" />
-      <View style={[globalStyles.paddingStatusBar, styles.container]}>
-        <Text style={styles.title}>Welcome to My App 👋</Text>
-        <Text style={styles.subtitle}>This is the Setting Screen</Text>
+      <View style={[globalStyles.paddingStatusBar, globalStyles.bodyContain]}>
+        <View style={styles.profile}>
+          <Ionicons name="person-circle-outline" size={150} color={colors.orangeWithOpacity} />
+
+        </View>
+        <View style={styles.contain_text}>
+          <Text style={styles.title}>Welcome to My App 👋</Text>
+          <Text style={styles.subtitle}>This is the Setting Screen</Text>
+        </View>
+        <View style={styles.space} />
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleLogout}
-          style={styles.logoutButton}
+          style={globalStyles.buttonContainer}
         >
-          <Text style={styles.logoutButtonText}>Logout</Text>
+          <Animated.View style={[globalStyles.button, { transform: [{ scale: buttonScale }] }]}>
+            <LinearGradient
+              colors={[colors.buttonRed.start, colors.button.end]}
+              style={globalStyles.buttonGradient}
+            >
+              <Text style={globalStyles.buttonText}>Log Out</Text>
+            </LinearGradient>
+          </Animated.View>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -33,14 +54,16 @@ const SettingScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
+  profile: {
     flex: 1,
-    backgroundColor: 'white',
+    paddingTop: 20,
+
   },
-  container: {
-    flex: 1,
+  contain_text: {
     alignItems: 'center',
     justifyContent: 'center',
+    flex: 1,
+
   },
   title: {
     fontSize: 24,
@@ -52,23 +75,8 @@ const styles = StyleSheet.create({
     color: 'gray',
     marginBottom: 20,
   },
-  logoutButton: {
-    padding: 15,
-    backgroundColor: '#3B82F6',
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '80%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  logoutButtonText: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    fontWeight: '600',
+  space: {
+    flex: 1
   },
 });
 
