@@ -18,15 +18,18 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 import { globalStyles } from '../../style/globalStyles';
+import { colors } from '../../utils/colors'
 
 
-type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
+type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
 const LoginScreen = () => {
   const [username, setUsername] = useState('khieng11');
   const [password, setPassword] = useState('password');
+  const [isUsernameFocused, setIsUsernameFocused] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
-  const [buttonScale] = useState(new Animated.Value(1)); 
+  const [buttonScale] = useState(new Animated.Value(1));
 
   const isDisable = username === '' || password === '';
 
@@ -55,7 +58,7 @@ const LoginScreen = () => {
     ]).start();
 
     if (username && password) {
-      Alert.alert(`Logging in with username: ${username}`);
+      Alert.alert(`Login successfuly with username: ${username}`);
       navigation.replace('Main');
     } else {
       Alert.alert('Please enter both username is "khieng11" and password is "password"');
@@ -64,44 +67,52 @@ const LoginScreen = () => {
 
   return (
     <LinearGradient
-      colors={['#6B7280', '#3B82F6', '#1E3A8A']}
+      colors={[
+        colors.gradientBackground.start,
+        colors.gradientBackground.mid,
+        colors.gradientBackground.end,
+      ]}
       style={globalStyles.container}
     >
       <SafeAreaView style={globalStyles.safeArea}>
-        <StatusBar barStyle="light-content" />
+        <StatusBar barStyle="dark-content" />
         <KeyboardAvoidingView
           style={styles.keyboardAvoidingContainer}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
         >
           <ScrollView
-            contentContainerStyle={styles.scrollContainer}
+            contentContainerStyle={globalStyles.scrollContainer}
             showsVerticalScrollIndicator={false}
           >
             <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
               <Text style={styles.title}>Welcome Back! 👋</Text>
               <Text style={styles.subtitle}>Sign in to your account</Text>
 
-              <View style={styles.inputContainer}>
+              <View style={[globalStyles.inputContainer, isUsernameFocused && globalStyles.inputFocused]}>
                 <TextInput
-                  style={styles.input}
-                  placeholder="Email"
-                  placeholderTextColor="#9CA3AF"
+                  style={[globalStyles.input, isUsernameFocused && { borderColor: colors.primary }]}
+                  placeholder="Username"
+                  placeholderTextColor={colors.placeholderTxt}
                   value={username}
                   onChangeText={setUsername}
                   keyboardType="email-address"
                   autoCapitalize="none"
+                  onFocus={() => setIsUsernameFocused(true)}
+                  onBlur={() => setIsUsernameFocused(false)}
                 />
               </View>
-              <View style={styles.inputContainer}>
+              <View style={[globalStyles.inputContainer, isPasswordFocused && globalStyles.inputFocused]}>
                 <TextInput
-                  style={styles.input}
+                  style={[globalStyles.input, isPasswordFocused && { borderColor: colors.primary }]}
                   placeholder="Password"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor={colors.placeholderTxt}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
                   autoCapitalize="none"
+                  onFocus={() => setIsPasswordFocused(true)}
+                  onBlur={() => setIsPasswordFocused(false)}
                 />
               </View>
 
@@ -109,11 +120,15 @@ const LoginScreen = () => {
                 activeOpacity={0.8}
                 onPress={handleLogin}
                 style={styles.buttonContainer}
-                disabled= {isDisable}
+                disabled={isDisable}
               >
                 <Animated.View style={[styles.button, { transform: [{ scale: buttonScale }] }]}>
                   <LinearGradient
-                    colors={isDisable  ? ['rgba(156, 163, 175, 0.4)', 'rgba(107, 114, 128, 0.4)'] : ['#3B82F6', '#1D4ED8']}
+                    colors={
+                      isDisable
+                        ? [colors.button.disabledStart, colors.button.disabledEnd]
+                        : [colors.button.start, colors.button.end]
+                    }
                     style={styles.buttonGradient}
                   >
                     <Text style={styles.buttonText}>Sign In</Text>
@@ -138,45 +153,23 @@ const styles = StyleSheet.create({
   keyboardAvoidingContainer: {
     flex: 1,
   },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingBottom: 20, // Extra padding for scroll
-  },
   content: {
     paddingHorizontal: 30,
   },
   title: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: colors.title,
     marginBottom: 10,
     textAlign: 'center',
     fontFamily: 'System',
   },
   subtitle: {
     fontSize: 18,
-    color: '#D1D5DB',
+    color: colors.text,
     marginBottom: 40,
     textAlign: 'center',
     fontFamily: 'System',
-  },
-  inputContainer: {
-    marginBottom: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  input: {
-    height: 56,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    color: '#FFFFFF',
-    borderRadius: 12,
   },
   buttonContainer: {
     marginTop: 20,
@@ -193,15 +186,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     fontFamily: 'System',
-    padding:16
+    padding: 16
   },
   forgotPassword: {
     marginTop: 20,
     alignItems: 'center',
   },
   forgotPasswordText: {
-    color: '#BFDBFE',
+    color: 'black',
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '400',
   },
 });

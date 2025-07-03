@@ -7,47 +7,60 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 
 import { globalStyles } from '../../style/globalStyles';
+import { Image } from "react-native";
+
+import { colors } from '../../utils/colors'
 
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
 
 const WelcomeScreen = () => {
     const buttonScale = useRef(new Animated.Value(1)).current;
-    const isDisabled = false; // Modify based on your logic
 
-     const navigation = useNavigation<LoginScreenNavigationProp>();
+    const navigation = useNavigation<LoginScreenNavigationProp>();
 
     const handlePress = () => {
         console.log('Button pressed');
         // Add your button press logic here
-        navigation.navigate('Onboarding')
+        navigation.replace('Onboarding')
     };
 
     return (
         <LinearGradient
-            colors={['#6B7280', '#3B82F6', '#1E3A8A']}
+            colors={[
+                colors.gradientBackground.start,
+                colors.gradientBackground.mid,
+                colors.gradientBackground.end,
+            ]}
             style={globalStyles.container}
         >
             <SafeAreaView style={globalStyles.safeArea}>
-                <StatusBar barStyle="light-content" />
+                <StatusBar
+                    backgroundColor="transparent"
+                    translucent
+                    barStyle="dark-content" // Use 'dark-content' if background is light
+                />
                 {/* Centered content container */}
                 <View style={styles.contentContainer}>
-                    <Text style={styles.title}>Welcome Back! 👋</Text>
-                    <Text style={styles.subtitle}>Sign in to your account</Text>
+                    <Image source={require('../../assets/images/image_trip.png')}
+                        style={{ width: '70%' }} resizeMode="contain" />
+                    <Text style={{ fontSize: 60, marginTop: 60 }}>👋</Text>
+                    <Text style={styles.title}>Welcome</Text>
+                    <Text style={styles.title}>to our WanderWise trip</Text>
+                    <Text style={styles.subtitle}>Manage your products in as fast as one hour</Text>
                 </View>
-                
+
                 {/* Spacer to push button to bottom */}
                 <View style={styles.spacer} />
-                
+
                 <TouchableOpacity
                     activeOpacity={0.8}
                     onPress={handlePress}
                     style={styles.buttonContainer}
-                    disabled={isDisabled}
                 >
                     <Animated.View style={[styles.button, { transform: [{ scale: buttonScale }] }]}>
                         <LinearGradient
-                            colors={isDisabled ? ['rgba(156, 163, 175, 0.4)', 'rgba(107, 114, 128, 0.4)'] : ['#3B82F6', '#1D4ED8']}
+                            colors={[colors.button.start, colors.button.end]}
                             style={styles.buttonGradient}
                         >
                             <Text style={styles.buttonText}>Get Started</Text>
@@ -77,17 +90,17 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 18,
-        color: '#D1D5DB',
-        marginBottom: 40,
+        color: 'white',
+        marginBottom: 0,
         textAlign: 'center',
         fontFamily: 'System',
     },
     spacer: {
-        flex: 0.1,
+        flex: 0,
     },
     buttonContainer: {
         width: '90%',
-        marginBottom: 20,
+        marginBottom: 40,
         alignSelf: 'center',
     },
     button: {
@@ -95,7 +108,6 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     buttonGradient: {
-   
         alignItems: 'center',
         justifyContent: 'center',
     },

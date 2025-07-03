@@ -1,23 +1,23 @@
-export interface Colors {
-    gradientStart: string;
-    gradientMid: string;
-    gradientEnd: string;
-    buttonGradientStart: string;
-    buttonGradientEnd: string;
-    buttonDisabledStart: string;
-    buttonDisabledEnd: string;
-    textPrimary: string;
-    textSecondary: string;
-}
+export const colors = {
+    gradientBackground: { 
+        start:  'rgba(253, 186, 116, 0.3)', 
+        mid:    'rgba(249, 115, 22, 0.3)', 
+        end:    'rgba(234, 88, 12, 0.3)' 
+    },
+    button: {
+        start:          '#F97316',
+        end:            '#EA580C',
+        disabledStart:  'rgba(156, 163, 175, 0.4)',
+        disabledEnd:    'rgba(107, 114, 128, 0.4)',
+    },
+    primary:    '#6200EE',
+    secondary:  '#6B7280',
+    title:      '#FFFFFF',
+    text:       '#FFFFFF',
 
-export const colors: Colors = {
-    gradientStart: '#6B7280',
-    gradientMid: '#3B82F6',
-    gradientEnd: '#1E3A8A',
-    buttonGradientStart: '#3B82F6',
-    buttonGradientEnd: '#1D4ED8',
-    buttonDisabledStart: 'rgba(156, 163, 175, 0.4)',
-    buttonDisabledEnd: 'rgba(107, 114, 128, 0.4)',
-    textPrimary: '#FFFFFF',
-    textSecondary: '#D1D5DB',
-};
+    placeholderTxt: '#A0A0A0', 
+
+} as const;
+
+export type Colors = typeof colors;
+

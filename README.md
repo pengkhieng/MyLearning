@@ -145,3 +145,9 @@ iOS
 ```
 
 > 📌 **Tip:** Always make sure your environment is correctly set up for Android and iOS development. Use `npx react-native doctor` to verify.
+
+
+### Onboarding 
+```powershell
+https://dribbble.com/shots/25587930-Travel-Itinerary-Onboarding
+```
