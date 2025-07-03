@@ -55,7 +55,7 @@ const WelcomeScreen = () => {
                 <TouchableOpacity
                     activeOpacity={0.8}
                     onPress={handlePress}
-                    style={[globalStyles.buttonContainer, globalStyles.paddingBody ]}
+                    style={[globalStyles.buttonContainer, {paddingHorizontal: 20} ]}
                 >
                     <Animated.View style={[globalStyles.button, { transform: [{ scale: buttonScale }] },{marginBottom: 20}]}>
                         <LinearGradient

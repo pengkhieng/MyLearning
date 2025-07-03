@@ -29,7 +29,7 @@ export const globalStyles = StyleSheet.create({
     inputContainer: {
         marginBottom: 24,
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
-        borderRadius: 16,
+        borderRadius: 12,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.6,
@@ -40,16 +40,16 @@ export const globalStyles = StyleSheet.create({
         paddingHorizontal: 16
     },
     input: {
-        height: 60,
+        height: 50,
         fontSize: 17,
         color: '#000',
         fontWeight: "600",
-        borderRadius: 12,
+        borderRadius: 10,
         fontFamily: 'System',
         letterSpacing: 1,
     },
     inputFocused: {
-        borderRadius: 16,
+        borderRadius: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.6,

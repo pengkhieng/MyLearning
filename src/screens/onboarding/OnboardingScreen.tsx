@@ -28,7 +28,7 @@ const onboardingData = [
         desc: ['Find trending destinations and must-see attractions,', 'all tailored to enhance your travel plans.'],
     },
 ];
-type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Onboarding'>;
 
 const OnboardingScreen = () => {
     const navigation = useNavigation<LoginScreenNavigationProp>();

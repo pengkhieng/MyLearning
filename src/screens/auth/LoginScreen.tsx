@@ -119,19 +119,19 @@ const LoginScreen = () => {
               <TouchableOpacity
                 activeOpacity={0.8}
                 onPress={handleLogin}
-                style={styles.buttonContainer}
+                style={globalStyles.buttonContainer}
                 disabled={isDisable}
               >
-                <Animated.View style={[styles.button, { transform: [{ scale: buttonScale }] }]}>
+                <Animated.View style={[globalStyles.button, { transform: [{ scale: buttonScale }] }]}>
                   <LinearGradient
                     colors={
                       isDisable
                         ? [colors.button.disabledStart, colors.button.disabledEnd]
                         : [colors.button.start, colors.button.end]
                     }
-                    style={styles.buttonGradient}
+                    style={globalStyles.buttonGradient}
                   >
-                    <Text style={styles.buttonText}>Sign In</Text>
+                    <Text style={globalStyles.buttonText}>Sign In</Text>
                   </LinearGradient>
                 </Animated.View>
               </TouchableOpacity>
@@ -170,23 +170,6 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     textAlign: 'center',
     fontFamily: 'System',
-  },
-  buttonContainer: {
-    marginTop: 20,
-  },
-  button: {
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  buttonGradient: {
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
-    fontFamily: 'System',
-    padding: 16
   },
   forgotPassword: {
     marginTop: 20,
