@@ -19,6 +19,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 import { globalStyles } from '../../style/globalStyles';
 import { colors } from '../../utils/colors'
+import CustomButton from '../../components/CustomButton';
 
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
@@ -74,7 +75,7 @@ const LoginScreen = () => {
       ]}
       style={globalStyles.container}
     >
-      <SafeAreaView style={{flex: 1}}>
+      <SafeAreaView style={{ flex: 1 }}>
         <StatusBar barStyle="dark-content" />
         <KeyboardAvoidingView
           style={styles.keyboardAvoidingContainer}
@@ -115,27 +116,14 @@ const LoginScreen = () => {
                   onBlur={() => setIsPasswordFocused(false)}
                 />
               </View>
-
-              <TouchableOpacity
-                activeOpacity={0.8}
+              <CustomButton
+                title="Sign In"
                 onPress={handleLogin}
-                style={globalStyles.buttonContainer}
-                disabled={isDisable}
-              >
-                <Animated.View style={[globalStyles.button, { transform: [{ scale: buttonScale }] }]}>
-                  <LinearGradient
-                    colors={
-                      isDisable
-                        ? [colors.button.disabledStart, colors.button.disabledEnd]
-                        : [colors.button.start, colors.button.end]
-                    }
-                    style={globalStyles.buttonGradient}
-                  >
-                    <Text style={globalStyles.buttonText}>Sign In</Text>
-                  </LinearGradient>
-                </Animated.View>
-              </TouchableOpacity>
-
+                animation="pulse"
+                duration={200}
+                isDisabled={isDisable}
+                buttonStyle={{ marginBottom: 10 }}
+              />
               <TouchableOpacity style={styles.forgotPassword}>
                 <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
               </TouchableOpacity>

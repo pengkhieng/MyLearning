@@ -7,6 +7,7 @@ import { RootStackParamList } from "../../navigation/AppNavigator";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 import { colors } from '../../utils/colors'
+import CustomButton from "../../components/CustomButton";
 
 type SettingScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setting'>;
 
@@ -30,7 +31,7 @@ const SettingScreen = () => {
   return (
     <SafeAreaView style={globalStyles.safeArea}>
       <StatusBar barStyle="dark-content" />
-      <View style={[globalStyles.bodyContain,globalStyles.paddingTop]}>
+      <View style={[globalStyles.bodyContain, globalStyles.paddingTop]}>
         <View style={styles.profile}>
           <Ionicons name="person-circle-outline" size={80} color="#4CAF50" />
           <Text style={styles.profileName}>Khieng11</Text>
@@ -47,22 +48,12 @@ const SettingScreen = () => {
             <Ionicons name="chevron-forward" size={24} color="#007AFF" />
           </TouchableOpacity>
         ))}
-        <TouchableOpacity
-          activeOpacity={0.8}
+        <CustomButton
+          title="Log Out"
           onPress={handleLogout}
-          style={[globalStyles.buttonContainer, { paddingTop: 20, paddingHorizontal: 20 }]}
-        >
-          <Animated.View style={[globalStyles.button, { transform: [{ scale: buttonScale }] }]}>
-            <LinearGradient
-              colors={
-                [colors.buttonRed.start, colors.buttonRed.end]
-              }
-              style={globalStyles.buttonGradient}
-            >
-              <Text style={globalStyles.buttonText}>Log Out</Text>
-            </LinearGradient>
-          </Animated.View>
-        </TouchableOpacity>
+          gradientColors={[colors.buttonRed.start, colors.buttonRed.end]}
+          containerStyle={{ paddingTop: 20, paddingHorizontal: 20 }}
+        />
         <View style={{ flex: 1 }} />
       </View>
     </SafeAreaView>

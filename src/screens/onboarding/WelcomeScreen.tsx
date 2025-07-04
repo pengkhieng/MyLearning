@@ -7,6 +7,7 @@ import type { RootStackParamList } from '../../navigation/AppNavigator';
 import { globalStyles } from '../../style/globalStyles';
 import { Image } from "react-native";
 import { colors } from '../../utils/colors'
+import CustomButton from "../../components/CustomButton";
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
 
@@ -35,7 +36,6 @@ const WelcomeScreen = () => {
                     translucent
                     barStyle="dark-content"
                 />
-                {/* Centered content container */}
                 <View style={styles.contentContainer}>
                     <Image source={require('../../assets/images/image_trip.png')}
                         style={{ width: '70%' }} resizeMode="contain" />
@@ -44,23 +44,14 @@ const WelcomeScreen = () => {
                     <Text style={styles.title}>to Your WanderWise Trip</Text>
                     <Text style={styles.subtitle}>Manage your plans in as little as a short time</Text>
                 </View>
-                {/* Spacer to push button to bottom */}
                 <View style={styles.spacer} />
 
-                <TouchableOpacity
-                    activeOpacity={0.8}
+                <CustomButton
+                    title="Get Started"
                     onPress={handlePress}
-                    style={[globalStyles.buttonContainer, { paddingHorizontal: 20 }]}
-                >
-                    <Animated.View style={[globalStyles.button, { marginBottom: 20 }]}>
-                        <LinearGradient
-                            colors={[colors.button.start, colors.button.end]}
-                            style={globalStyles.buttonGradient}
-                        >
-                            <Text style={globalStyles.buttonText}>Get Started</Text>
-                        </LinearGradient>
-                    </Animated.View>
-                </TouchableOpacity>
+                    containerStyle={{ paddingHorizontal: 20 }}
+                    buttonStyle={{ marginBottom: 20 }}
+                />
             </SafeAreaView>
         </LinearGradient>
     );

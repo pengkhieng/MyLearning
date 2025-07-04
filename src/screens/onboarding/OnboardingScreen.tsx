@@ -57,7 +57,7 @@ const OnboardingScreen = () => {
     return (
         <SafeAreaView style={globalStyles.safeArea}>
             <StatusBar barStyle="dark-content" />
-            <View style={[globalStyles.container,globalStyles.paddingTop]}>
+            <View style={[globalStyles.container, globalStyles.paddingTop]}>
                 <View style={styles.contain_image}>
                     <Image
                         source={require('../../assets/images/image_trip.png')}
