@@ -13,7 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const DetailScreen = ({ route }: any) => {
-  const { title, data, color } = route.params; // ✅ Get color here
+  const { title, data, color } = route.params;
   const navigation = useNavigation();
 
   const renderValue = (item: any, index: number, colors?: string) => {
@@ -72,7 +72,7 @@ const DetailScreen = ({ route }: any) => {
           <Text style={styles.title}>{title}</Text>
         </View>
 
-        <View style={styles.content}>{renderValue(data, 0, color)}</View> {/* ✅ pass color */}
+        <View style={styles.content}>{renderValue(data, 0, color)}</View>
       </View>
     </SafeAreaView>
   );

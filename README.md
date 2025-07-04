@@ -151,3 +151,15 @@ iOS
 ```powershell
 https://dribbble.com/shots/25587930-Travel-Itinerary-Onboarding
 ```
+
+## Screen Shot
+<img src="./src/assets/screen_shot/one.png" width="300" />
+<img src="./src/assets/screen_shot/two.png" width="300" />
+<img src="./src/assets/screen_shot/three.png" width="300" />
+<img src="./src/assets/screen_shot/four.png" width="300" />
+<img src="./src/assets/screen_shot/five.png" width="300" />
+<img src="./src/assets/screen_shot/six.png." width="300" />
+<img src="./src/assets/screen_shot/seven.1.png" width="300" />
+<img src="./src/assets/screen_shot/seven.2.png" width="300" />
+<img src="./src/assets/screen_shot/seven.3.png" width="300" />
+<img src="./src/assets/screen_shot/eight.png" width="300" />
