@@ -12,6 +12,10 @@ API_URL = 'https://khieng.online/api';
 # swagger 
 https://khieng.online/api/swagger-ui/index.html#/
 
+# Login user on swagger
+username: khieng11
+password: password
+
 ```
 
 ---
