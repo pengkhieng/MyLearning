@@ -22,7 +22,7 @@ const SettingScreen = () => {
   const email = AsyncStorage.getItem('email');
   const handleLogout = async () => {
     try {
-      await AsyncStorage.multiRemove(['accessToken', 'tokenExpiration', 'refreshToken']);
+      await AsyncStorage.multiRemove(['accessToken', 'tokenExpiration', 'refreshToken', 'userId', 'username', 'email', 'roles']);
       navigation.replace('Welcome');
     } catch (error) {
       console.error('Logout error:', error);

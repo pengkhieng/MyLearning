@@ -4,6 +4,18 @@ A handy guide for getting started and managing your React Native projects using 
 
 ---
 
+## ✅ BACK-END API
+
+```powershell
+API_URL = 'https://khieng.online/api';
+
+# swagger 
+https://khieng.online/api/swagger-ui/index.html#/
+
+```
+
+---
+
 ## ✅ Check React Native CLI Version
 
 ```powershell
@@ -82,6 +94,8 @@ react-native info                     # Show environment info
 react-native doctor                   # Diagnose setup issues
 ```
 
+---
+
 ## ✅ All dependencies 
 
 ```powershell
@@ -100,7 +114,7 @@ npm install react-native-reanimated        # Supports advanced animations and tr
 npx pod-install
 ```
 
-
+---
 
 ### TypeScript Setup
 ```powershell
@@ -117,7 +131,7 @@ node --version && java --version
  = > OpenJDK 64-Bit Server VM Homebrew (build 17.0.14+0, mixed mode, sharing)
 ```
 
-
+---
 
 ##  React Native Environment Check
 ```powershell

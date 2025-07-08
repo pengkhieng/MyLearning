@@ -62,6 +62,7 @@ const LoginScreen = () => {
       Alert.alert('Please enter both username and password');
       return;
     }
+    console.log('Login attempt with:', { username, password });
 
     try {
       const response = await fetch('https://khieng.online/api/auth/login', {
@@ -81,6 +82,8 @@ const LoginScreen = () => {
       if (response.ok && data.status === "1") {
         // Store tokens and expiration
         const expirationDate = new Date().getTime() + (data.data.expiresIn * 1000);
+
+        console.log('Login data:',  data);
      // Store tokens and user data in AsyncStorage
      await AsyncStorage.multiSet([
       ['accessToken', data.data.accessToken],
