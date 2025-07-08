@@ -8,6 +8,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 import { colors } from '../../utils/colors'
 import CustomButton from "../../components/CustomButton";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 type SettingScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setting'>;
 
@@ -15,8 +17,16 @@ const SettingScreen = () => {
 
   const buttonScale = useRef(new Animated.Value(1)).current;
   const navigation = useNavigation<SettingScreenNavigationProp>();
-  const handleLogout = () => {
-    navigation.replace('Welcome');
+
+  const username = AsyncStorage.getItem('username');
+  const email = AsyncStorage.getItem('email');
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.multiRemove(['accessToken', 'tokenExpiration', 'refreshToken']);
+      navigation.replace('Welcome');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   const settingsOptions = [
@@ -34,8 +44,8 @@ const SettingScreen = () => {
       <View style={[globalStyles.bodyContain, globalStyles.paddingTop]}>
         <View style={styles.profile}>
           <Ionicons name="person-circle-outline" size={80} color="#4CAF50" />
-          <Text style={styles.profileName}>Khieng11</Text>
-          <Text style={styles.profileEmail}>Khieng11@gmail.com</Text>
+          <Text style={styles.profileName}>{username ?? ""}</Text>
+          <Text style={styles.profileEmail}>{email ?? ""}</Text>
         </View>
         {settingsOptions.map((item, index) => (
           <TouchableOpacity

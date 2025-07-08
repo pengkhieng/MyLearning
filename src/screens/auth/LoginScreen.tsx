@@ -18,9 +18,9 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 import { globalStyles } from '../../style/globalStyles';
-import { colors } from '../../utils/colors'
+import { colors } from '../../utils/colors';
 import CustomButton from '../../components/CustomButton';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -44,7 +44,7 @@ const LoginScreen = () => {
     }).start();
   }, [fadeAnim]);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     Animated.sequence([
       Animated.timing(buttonScale, {
         toValue: 0.95,
@@ -58,11 +58,48 @@ const LoginScreen = () => {
       }),
     ]).start();
 
-    if (username && password) {
-      Alert.alert(`Login successfuly with username: ${username}`);
-      navigation.replace('Main');
-    } else {
-      Alert.alert('Please enter both username is "khieng11" and password is "password"');
+    if (!username || !password) {
+      Alert.alert('Please enter both username and password');
+      return;
+    }
+
+    try {
+      const response = await fetch('https://khieng.online/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Accept': '*/*',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.status === "1") {
+        // Store tokens and expiration
+        const expirationDate = new Date().getTime() + (data.data.expiresIn * 1000);
+     // Store tokens and user data in AsyncStorage
+     await AsyncStorage.multiSet([
+      ['accessToken', data.data.accessToken],
+      ['refreshToken', data.data.refreshToken],
+      ['tokenExpiration', expirationDate.toString()],
+      ['userId', data.data.user.id],
+      ['username', data.data.user.username],
+      ['email', data.data.user.email || ''], // Handle null email
+      ['roles', JSON.stringify(data.data.user.roles)], // Store roles as JSON string
+    ]);
+
+        Alert.alert('Success', data.message);
+        navigation.replace('Main');
+      } else {
+        Alert.alert('Login Failed', data.message || 'Invalid credentials');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Network error occurred. Please try again.');
+      console.error('Login error:', error);
     }
   };
 
