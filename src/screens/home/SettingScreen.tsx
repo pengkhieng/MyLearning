@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView, StatusBar, View, Text, TouchableOpacity, StyleSheet, Animated, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -9,6 +9,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { colors } from '../../utils/colors'
 import CustomButton from "../../components/CustomButton";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { User } from "../../types/authTypes";
 
 
 type SettingScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setting'>;
@@ -18,8 +19,18 @@ const SettingScreen = () => {
   const buttonScale = useRef(new Animated.Value(1)).current;
   const navigation = useNavigation<SettingScreenNavigationProp>();
 
-  const username = AsyncStorage.getItem('username');
-  const email = AsyncStorage.getItem('email');
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userString = await AsyncStorage.getItem("user");
+      const userData: User | null = userString ? JSON.parse(userString) : null;
+      setUser(userData);
+    };
+
+    fetchUser();
+  }, []);
+
   const handleLogout = async () => {
     try {
       await AsyncStorage.multiRemove(['accessToken', 'tokenExpiration', 'refreshToken', 'userId', 'username', 'email', 'roles']);
@@ -44,8 +55,9 @@ const SettingScreen = () => {
       <View style={[globalStyles.bodyContain, globalStyles.paddingTop]}>
         <View style={styles.profile}>
           <Ionicons name="person-circle-outline" size={80} color="#4CAF50" />
-          <Text style={styles.profileName}>{username ?? ""}</Text>
-          <Text style={styles.profileEmail}>{email ?? ""}</Text>
+          <Text style={styles.profileName}>{user?.username ?? ""}</Text>
+          <Text style={styles.profileEmail}>{user?.email ?? ""}</Text>
+          <Text style={styles.profileEmail}>{user?.roles ?? ""}</Text>
         </View>
         {settingsOptions.map((item, index) => (
           <TouchableOpacity

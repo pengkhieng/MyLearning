@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Alert,
   View,
@@ -16,27 +16,27 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../../navigation/AppNavigator';
-import { globalStyles } from '../../style/globalStyles';
-import { colors } from '../../utils/colors';
-import CustomButton from '../../components/CustomButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLogin } from '../../hooks/useLogin';
+import { colors } from '../../utils/colors';
+import { globalStyles } from '../../style/globalStyles';
+import CustomButton from '../../components/CustomButton';
+import type { RootStackParamList } from '../../navigation/AppNavigator';
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
 const LoginScreen = () => {
-  const [username, setUsername] = useState('khieng11');
+  const [username, setUsername] = useState('khieng');
   const [password, setPassword] = useState('password');
   const [isUsernameFocused, setIsUsernameFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
-  const [buttonScale] = useState(new Animated.Value(1));
+  const { loginUser, loading, error, data } = useLogin();
+  const navigation = useNavigation<LoginScreenNavigationProp>();
 
   const isDisable = username === '' || password === '';
 
-  const navigation = useNavigation<LoginScreenNavigationProp>();
-
-  React.useEffect(() => {
+  useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 1000,
@@ -45,65 +45,22 @@ const LoginScreen = () => {
   }, [fadeAnim]);
 
   const handleLogin = async () => {
-    Animated.sequence([
-      Animated.timing(buttonScale, {
-        toValue: 0.95,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(buttonScale, {
-        toValue: 1,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    if (!username || !password) {
-      Alert.alert('Please enter both username and password');
-      return;
-    }
-    console.log('Login attempt with:', { username, password });
-
     try {
-      const response = await fetch('https://khieng.online/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Accept': '*/*',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-        }),
-      });
+      const response = await loginUser(username, password);
+      await AsyncStorage.setItem('accessToken', response.data?.accessToken ?? '');
+      await AsyncStorage.setItem('refreshToken', response.data?.refreshToken ?? '');
 
-      const data = await response.json();
-
-      if (response.ok && data.status === "1") {
-        // Store tokens and expiration
-        const expirationDate = new Date().getTime() + (data.data.expiresIn * 1000);
-
-        console.log('Login data:',  data);
-     // Store tokens and user data in AsyncStorage
-     await AsyncStorage.multiSet([
-      ['accessToken', data.data.accessToken],
-      ['refreshToken', data.data.refreshToken],
-      ['tokenExpiration', expirationDate.toString()],
-      ['userId', data.data.user.id],
-      ['username', data.data.user.username],
-      ['email', data.data.user.email || ''], // Handle null email
-      ['roles', JSON.stringify(data.data.user.roles)], // Store roles as JSON string
-    ]);
-
-        Alert.alert('Success', data.message);
-        navigation.replace('Main');
-      } else {
-        Alert.alert('Login Failed', data.message || 'Invalid credentials');
+      if (response.data?.user != null) {
+        await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
       }
-    } catch (error) {
-      Alert.alert('Error', 'Network error occurred. Please try again.');
-      console.error('Login error:', error);
+      navigation.navigate('Main');
+    } catch (err) {
+      Alert.alert('Login Failed', error || 'An error occurred during login');
     }
+  };
+
+  const handleForgotPassword = () => {
+    Alert.alert('Forgot Password', 'This feature is not yet implemented.');
   };
 
   return (
@@ -137,7 +94,7 @@ const LoginScreen = () => {
                   placeholderTextColor={colors.placeholderTxt}
                   value={username}
                   onChangeText={setUsername}
-                  keyboardType="email-address"
+                  keyboardType="default"
                   autoCapitalize="none"
                   onFocus={() => setIsUsernameFocused(true)}
                   onBlur={() => setIsUsernameFocused(false)}
@@ -156,15 +113,17 @@ const LoginScreen = () => {
                   onBlur={() => setIsPasswordFocused(false)}
                 />
               </View>
+              {error && <Text style={styles.error}>{error}</Text>}
+              {data && <Text style={styles.success}>{data.message}</Text>}
               <CustomButton
-                title="Sign In"
+                title={loading ? 'Signing In...' : 'Sign In'}
                 onPress={handleLogin}
                 animation="pulse"
                 duration={200}
-                isDisabled={isDisable}
+                isDisabled={isDisable || loading}
                 buttonStyle={{ marginBottom: 10 }}
               />
-              <TouchableOpacity style={styles.forgotPassword}>
+              <TouchableOpacity onPress={handleForgotPassword} style={styles.forgotPassword}>
                 <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
               </TouchableOpacity>
             </Animated.View>
@@ -174,8 +133,6 @@ const LoginScreen = () => {
     </LinearGradient>
   );
 };
-
-export default LoginScreen;
 
 const styles = StyleSheet.create({
   keyboardAvoidingContainer: {
@@ -190,22 +147,32 @@ const styles = StyleSheet.create({
     color: colors.title,
     marginBottom: 10,
     textAlign: 'center',
-    fontFamily: 'System',
   },
   subtitle: {
     fontSize: 18,
     color: colors.text,
     marginBottom: 40,
     textAlign: 'center',
-    fontFamily: 'System',
   },
   forgotPassword: {
     marginTop: 20,
     alignItems: 'center',
   },
   forgotPasswordText: {
-    color: 'black',
+    color: colors.text,
     fontSize: 16,
     fontWeight: '400',
   },
+  error: {
+    color: 'red',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  success: {
+    color: 'green',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
 });
+
+export default LoginScreen;
