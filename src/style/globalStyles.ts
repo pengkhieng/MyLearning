@@ -1,17 +1,27 @@
 import { StyleSheet, Platform } from 'react-native';
 
 export const globalStyles = StyleSheet.create({
-    paddingTop:{
-        marginTop: Platform.OS === 'android' ? 40 : 0,
+
+    // Body contain
+    scrollView: {
+        width: '100%',
     },
-    paddingStatusBar: {
-        marginTop: Platform.OS === 'android' ? 40 : 0,
+    contentContainer: {
+        paddingTop: Platform.OS === 'ios' ? 60 : 40,
+        paddingBottom: Platform.OS === 'ios' ? 100 : 80,
         paddingHorizontal: 16,
+        flexGrow: 1,
+    },
+    // end body contain
+
+
+    paddingStatusBar: {
+        marginTop: Platform.OS === 'android' ? 0 : 0,
         paddingBottom: 0,
         marginBottom: 0
     },
     paddingBody: {
-        paddingHorizontal: 16,
+        // paddingHorizontal: 16,
         paddingBottom: 0,
         marginBottom: 0
     },
@@ -26,7 +36,7 @@ export const globalStyles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingBottom: 50,
+        paddingBottom: 60,
     },
     inputContainer: {
         marginBottom: 24,

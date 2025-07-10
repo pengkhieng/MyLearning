@@ -46,15 +46,14 @@ const MainScreen = () => {
         tabBarStyle: {
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
-          backgroundColor: 'rgba(249, 116, 22, 0.3)',
+          backgroundColor: 'rgb(255, 191, 145)',
           position: 'absolute',
           overflow: 'hidden',
           shadowColor: 'gray',
-          shadowOffset: { width: 0, height: -3 },
+          shadowOffset: { width: 0, height: -3},
           shadowOpacity: 0.2,
           shadowRadius: 6,
           elevation: 0,
-          paddingTop: 10,
         },
       })}
     >

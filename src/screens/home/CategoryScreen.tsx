@@ -1,57 +1,109 @@
-import React from "react";
-import {  StatusBar, View, Text, StyleSheet, FlatList } from 'react-native';
-import { globalStyles } from "../../style/globalStyles";
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { useCategories } from '../../hooks/useCategories';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
+import { globalStyles } from '../../style/globalStyles';
 
 const CategoryScreen = () => {
-    const { categories, loading, error } = useCategories();
+  const { categories, loading, error, fetchCategories } = useCategories();
 
+  // Trigger API call every time the screen is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchCategories(true); // Force refresh to bypass cache
+      return () => {
+        // Optional cleanup if needed
+      };
+    }, [fetchCategories])
+  );
+
+  if (loading) {
     return (
-        <SafeAreaView  style={{ flex: 1 }}  edges={[]}>
-            <StatusBar barStyle="dark-content" />
-            <View style={[globalStyles.paddingStatusBar, globalStyles.bodyContain]}>
-                <FlatList
-                    style={{ width: '100%', paddingTop: 50, marginBottom: 35 }}
-                    data={categories}
-                    keyExtractor={(item) => item.id}
-                    showsVerticalScrollIndicator={false} 
-                    renderItem={({ item, index }) => (
-                        <View style={[styles.card, {
-                            backgroundColor: index % 2 !== 0 ? 'rgba(255, 241, 235, 0.35)' : 'rgba(177, 227, 255, 0.2)',
-                            height: 60
-                        }]}>
-                            <Text style={styles.name}>{item.name.trim()}</Text>
-                            {item.description ? <Text>{item.description}</Text> : null}
-                        </View>
-                    )}
-                />
-            </View>
-        </SafeAreaView>
+      <View style={[globalStyles.contentContainer, styles.centered]}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
     );
+  }
+
+  if (error) {
+    return (
+      <View style={[globalStyles.contentContainer, styles.centered]}>
+        <Text style={styles.errorText}>Error: {error}</Text>
+      </View>
+    );
+  }
+
+  if (categories.length === 0) {
+    return (
+      <View style={[globalStyles.contentContainer, styles.centered]}>
+        <Text style={styles.noDataText}>No categories available</Text>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView
+      style={globalStyles.scrollView}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={globalStyles.contentContainer}
+    >
+      {categories.map((item, index) => (
+        <View
+          key={item.id.toString()} // Ensure key is a string
+          style={[
+            styles.itemContainer,
+            {
+              backgroundColor: index % 2 !== 0 ? 'rgba(255, 145, 0, 0.1)' : 'rgba(0, 128, 0, 0.1)',
+            },
+          ]}
+        >
+          <Text style={styles.itemText}>{item.name?.trim() || 'Unnamed Category'}</Text>
+          {item.description ? (
+            <Text style={styles.itemDescription} numberOfLines={1} ellipsizeMode="tail">
+              {item.description}
+            </Text>
+          ) : null}
+        </View>
+      ))}
+    </ScrollView>
+  );
 };
 
 export default CategoryScreen;
 
 const styles = StyleSheet.create({
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    error: {
-        color: 'red',
-        marginBottom: 10,
-    },
-    card: {
-        padding: 10,
-        marginVertical: 6,
-        backgroundColor: '#f2f2f2',
-        borderRadius: 8,
-    },
-    name: {
-        fontWeight: '600',
-        fontSize: 16,
-    },
+  itemContainer: {
+    padding: 12,
+    borderRadius: 6,
+    marginBottom: 8,
+    alignSelf: 'stretch',
+    minHeight: 70,
+  },
+  itemText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'black',
+  },
+  itemDescription: {
+    fontSize: 14,
+    color: 'gray',
+    marginTop: 4,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: 'gray',
+  },
+  errorText: {
+    fontSize: 16,
+    color: 'red',
+  },
+  noDataText: {
+    fontSize: 16,
+    color: 'gray',
+  },
 });

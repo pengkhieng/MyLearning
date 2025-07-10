@@ -1,15 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import { SafeAreaView, StatusBar, View, Text, TouchableOpacity, StyleSheet, Animated, Image } from 'react-native';
+import { ScrollView, View, Text, TouchableOpacity, StyleSheet, Animated, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { globalStyles } from "../../style/globalStyles";
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import LinearGradient from 'react-native-linear-gradient';
 import { colors } from '../../utils/colors'
 import CustomButton from "../../components/CustomButton";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User } from "../../types/authTypes";
+import { globalStyles } from "../../style/globalStyles";
 
 
 type SettingScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setting'>;
@@ -50,35 +49,34 @@ const SettingScreen = () => {
   ];
 
   return (
-    <SafeAreaView style={globalStyles.safeArea}>
-      <StatusBar barStyle="dark-content" />
-      <View style={[globalStyles.bodyContain, globalStyles.paddingTop]}>
-        <View style={styles.profile}>
-          <Ionicons name="person-circle-outline" size={80} color="#4CAF50" />
-          <Text style={styles.profileName}>{user?.username ?? ""}</Text>
-          <Text style={styles.profileEmail}>{user?.email ?? ""}</Text>
-          <Text style={styles.profileEmail}>{user?.roles ?? ""}</Text>
-        </View>
-        {settingsOptions.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.option}
-          // onPress={() => navigation.navigate(item.screen)}
-          >
-            <Ionicons name={item.icon} size={24} color="#000" />
-            <Text style={styles.optionText}>{item.label}</Text>
-            <Ionicons name="chevron-forward" size={24} color="#007AFF" />
-          </TouchableOpacity>
-        ))}
-        <CustomButton
-          title="Log Out"
-          onPress={handleLogout}
-          gradientColors={[colors.buttonRed.start, colors.buttonRed.end]}
-          containerStyle={{ paddingTop: 20, paddingHorizontal: 20 }}
-        />
-        <View style={{ flex: 1 }} />
+    <ScrollView
+      style={globalStyles.scrollView}
+      contentContainerStyle={globalStyles.contentContainer}
+    >
+      <View style={styles.profile}>
+        <Ionicons name="person-circle-outline" size={80} color="#4CAF50" />
+        <Text style={styles.profileName}>{user?.username ?? ""}</Text>
+        <Text style={styles.profileEmail}>{user?.email ?? ""}</Text>
+        <Text style={styles.profileEmail}>{user?.roles ?? ""}</Text>
       </View>
-    </SafeAreaView>
+      {settingsOptions.map((item, index) => (
+        <TouchableOpacity
+          key={index}
+          style={styles.option}
+        // onPress={() => navigation.navigate(item.screen)}
+        >
+          <Ionicons name={item.icon} size={24} color="#000" />
+          <Text style={styles.optionText}>{item.label}</Text>
+          <Ionicons name="chevron-forward" size={24} color="#007AFF" />
+        </TouchableOpacity>
+      ))}
+      <CustomButton
+        title="Log Out"
+        onPress={handleLogout}
+        gradientColors={[colors.buttonRed.start, colors.buttonRed.end]}
+        containerStyle={{ paddingTop: 20 }}
+      />
+    </ScrollView>
   );
 };
 

@@ -53,7 +53,7 @@ const LoginScreen = () => {
       if (response.data?.user != null) {
         await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
       }
-      navigation.navigate('Main');
+      navigation.replace('Main');
     } catch (err) {
       Alert.alert('Login Failed', error || 'An error occurred during login');
     }

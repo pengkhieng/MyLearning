@@ -1,16 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, FlatList } from 'react-native';
-import { globalStyles } from '../../style/globalStyles';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
 import { Dashboard } from '../../models/home/dashboard';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from "../../navigation/AppNavigator";
+import { RootStackParamList } from '../../navigation/AppNavigator';
 import { useNavigation } from '@react-navigation/native';
 import { colors } from '../../utils/colors';
+import { globalStyles } from '../../style/globalStyles'
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Main'>;
 
 const HomeScreen = () => {
-
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
   const dashboardData: Dashboard = {
@@ -36,61 +35,55 @@ const HomeScreen = () => {
     { title: 'Top Products', key: 'topProducts', value: dashboardData.topProducts, colors: colors.customGreen },
     { title: 'Daily Sales', key: 'dailySales', value: dashboardData.dailySales, colors: colors.customDarkBlue },
   ];
-  const renderItem = ({ item }: any) => (
-    <TouchableOpacity
-      style={[styles.card, { backgroundColor: item.colors }]} 
-      onPress={() =>
-        navigation.navigate('Detail', {
-          title: item.title,
-          data: item.value,
-          color: item.colors, 
-        })
-      }
-    >
-      <Text style={styles.cardText}>{item.title}</Text>
-    </TouchableOpacity>
-  );
 
   return (
-    <SafeAreaView style={globalStyles.container}>
+    <View>
       <StatusBar barStyle="dark-content" />
-      <View style={[globalStyles.paddingStatusBar, globalStyles.bodyContain]}>
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          numColumns={2}
-          columnWrapperStyle={{ justifyContent: 'space-between' }}
-          keyExtractor={(item) => item.key}
-          contentContainerStyle={{ marginTop: 20 }}
-        />
-      </View>
-    </SafeAreaView>
+      <ScrollView
+        style={globalStyles.scrollView}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={globalStyles.contentContainer}>
+        <View style={styles.cardGrid}>
+          {data.map((item, index) => (
+            <TouchableOpacity
+              key={item.key}
+              style={[styles.card, { backgroundColor: item.colors }]}
+              onPress={() =>
+                navigation.navigate('Detail', {
+                  title: item.title,
+                  data: item.value,
+                  color: item.colors,
+                })
+              }
+            >
+              <Text style={styles.cardText}>{item.title}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#555',
+  cardGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
   card: {
+    width: '48%',
     padding: 20,
     borderRadius: 10,
     marginBottom: 16,
-    width: '48%',
     alignItems: 'center',
     paddingVertical: 40,
   },
   cardText: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'white'
+    color: 'white',
   },
 });

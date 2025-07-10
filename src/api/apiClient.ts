@@ -1,11 +1,10 @@
-import { HttpMethod } from '../enum/HttpMethod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { HttpMethod } from '../enum/HttpMethod';
 import { BaseResponse } from '../types/baseResponseTypes';
 
 const BASE_URL = 'https://khieng.online/api';
 const TIMEOUT = 10000;
 const ENABLE_LOGS = true;
-
 
 interface FetchOptions {
   method: string;
@@ -26,7 +25,6 @@ interface ApiRequestOptions {
   method?: HttpMethod;
   url: string;
   data?: any;
-  token?: string;
   requiresHeader?: boolean;
 }
 
@@ -43,15 +41,15 @@ export const makeApiCall = async <T>({
 
   if (requiresHeader) {
     const token = await AsyncStorage.getItem('accessToken');
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
+    if (!token) {
+      throw new ApiError('No access token found', 401);
     }
+    headers.Authorization = `Bearer ${token}`;
   }
 
-  // Logs
   if (ENABLE_LOGS) {
     console.group(`🌐 API Request: ${method} ${url}`);
-    console.table(headers);
+    console.table({ Method: method, URL: url, Headers: headers });
     if (data && method !== HttpMethod.GET) {
       console.log('📤 Request Body:', JSON.stringify(data, null, 2));
     }
@@ -62,7 +60,8 @@ export const makeApiCall = async <T>({
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
 
   try {
-    const response = await fetch(`${BASE_URL}${url}`, {
+    const fullUrl = `${BASE_URL}${url.startsWith('/') ? url : `/${url}`}`;
+    const response = await fetch(fullUrl, {
       method,
       headers,
       body: data && method !== HttpMethod.GET ? JSON.stringify(data) : undefined,
@@ -71,7 +70,12 @@ export const makeApiCall = async <T>({
 
     clearTimeout(timeoutId);
 
-    const responseBody: BaseResponse<T> = await response.json();
+    let responseBody: BaseResponse<T>;
+    try {
+      responseBody = await response.json();
+    } catch (e) {
+      throw new ApiError('Invalid JSON response', response.status);
+    }
 
     if (ENABLE_LOGS) {
       console.group('✅ API Response');
