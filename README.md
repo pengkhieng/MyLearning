@@ -127,6 +127,51 @@ npm install --save-dev typescript @types/react @types/react-native
 
 ---
 
+## ✅ Clean Build Android
+
+```powershell
+# Clean the npm
+npm cache clean --force
+
+# Clean the Gradle build cache (for Android)
+cd android
+./gradlew clean
+cd ..
+
+# Remove the node_modules folder and package-lock.json (optional, if needed)
+rm -rf node_modules package-lock.json
+# Reinstall dependencies
+npm install
+
+# Clean the Metro bundler cache
+npx react-native start --reset-cache
+
+```
+
+---
+
+## ✅ Clean Build iOS
+
+```powershell
+# Navigate to the iOS folder
+cd ios
+
+# Clean the Xcode build
+xcodebuild clean
+
+# Remove the build folder
+rm -rf build
+
+# Clean the Pods cache (if using CocoaPods)
+pod cache clean --all
+rm -rf Pods
+pod install
+cd ..
+
+```
+
+---
+
 ```powershell
 node --version && java --version
  = > v20.19.3

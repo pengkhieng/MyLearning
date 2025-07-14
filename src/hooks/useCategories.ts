@@ -15,7 +15,6 @@ export const useCategories = () => {
     setError(null);
 
     try {
-      // Check for cached categories
       if (!forceRefresh) {
         const cachedCategories = await AsyncStorage.getItem('categories');
         if (cachedCategories) {
@@ -38,7 +37,6 @@ export const useCategories = () => {
 
       const data = response.data || [];
       setCategories(data);
-      // Cache the categories
       await AsyncStorage.setItem('categories', JSON.stringify(data));
     } catch (err: any) {
       const errorMessage =
@@ -51,9 +49,131 @@ export const useCategories = () => {
     }
   }, []);
 
+  const addCategory = useCallback(async (category: { name: string; description?: string }) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        throw new Error('No access token found. Please log in.');
+      }
+
+      const response = await makeApiCall<Category>({
+        method: HttpMethod.POST,
+        url: ApiEndpoints.CATEGORY.CREATE,
+        requiresHeader: true,
+        data: {
+          name: category.name,
+          description: category.description || '',
+        },
+      });
+
+      if (!response.data) {
+        throw new Error('Failed to create category: No data returned');
+      }
+
+      const newCategory: Category = response.data;
+      setCategories((prevCategories) => {
+        const updatedCategories = [...prevCategories, newCategory];
+        AsyncStorage.setItem('categories', JSON.stringify(updatedCategories)).catch((err) =>
+          console.error('Failed to update AsyncStorage:', err)
+        );
+        return updatedCategories;
+      });
+    } catch (err: any) {
+      const errorMessage =
+        err.status === 401
+          ? 'Unauthorized. Please log in again.'
+          : err.message || 'Failed to add category';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const editCategory = useCallback(async (id: string, category: { name: string; description?: string }) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        throw new Error('No access token found. Please log in.');
+      }
+
+      const response = await makeApiCall<Category>({
+        method: HttpMethod.PUT,
+        url: `${ApiEndpoints.CATEGORY.UPDATE}/${id}`,
+        requiresHeader: true,
+        data: {
+          name: category.name,
+          description: category.description || '',
+        },
+      });
+
+      if (!response.data) {
+        throw new Error('Failed to update category: No data returned');
+      }
+
+      const updatedCategory: Category = response.data;
+      setCategories((prevCategories) => {
+        const updatedCategories = prevCategories.map((cat) =>
+          cat.id === id ? updatedCategory : cat
+        );
+        AsyncStorage.setItem('categories', JSON.stringify(updatedCategories)).catch((err) =>
+          console.error('Failed to update AsyncStorage:', err)
+        );
+        return updatedCategories;
+      });
+    } catch (err: any) {
+      const errorMessage =
+        err.status === 401
+          ? 'Unauthorized. Please log in again.'
+          : err.message || 'Failed to update category';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const deleteCategory = useCallback(async (id: string) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (!token) {
+        throw new Error('No access token found. Please log in.');
+      }
+
+      await makeApiCall<void>({
+        method: HttpMethod.DELETE,
+        url: `${ApiEndpoints.CATEGORY.DELETE}/${id}`,
+        requiresHeader: true,
+      });
+
+      setCategories((prevCategories) => {
+        const updatedCategories = prevCategories.filter((cat) => cat.id !== id);
+        AsyncStorage.setItem('categories', JSON.stringify(updatedCategories)).catch((err) =>
+          console.error('Failed to update AsyncStorage:', err)
+        );
+        return updatedCategories;
+      });
+    } catch (err: any) {
+      const errorMessage =
+        err.status === 401
+          ? 'Unauthorized. Please log in again.'
+          : err.message || 'Failed to delete category';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
 
-  return { categories, loading, error, fetchCategories };
+  return { categories, loading, error, fetchCategories, addCategory, editCategory, deleteCategory };
 };

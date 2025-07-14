@@ -13,6 +13,9 @@ export class ApiEndpoints {
 
     static readonly CATEGORY = {
       LIST: '/category',
+      UPDATE: '/category',
+      DELETE: '/category',
+      CREATE: '/category',
     };
     
   }
