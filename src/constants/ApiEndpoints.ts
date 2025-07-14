@@ -25,5 +25,12 @@ export class ApiEndpoints {
       DELETE: '/item',
       CREATE: '/item',
     };
+
+    static readonly ORDER = {
+      LIST: '/orders',
+      UPDATE: '/orders',
+      DELETE: '/orders',
+      CREATE: '/orders',
+    };
     
   }
