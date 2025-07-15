@@ -54,10 +54,23 @@ const SettingScreen = () => {
       contentContainerStyle={globalStyles.contentContainer}
     >
       <View style={styles.profile}>
-        <Ionicons name="person-circle-outline" size={80} color="#4CAF50" />
+
+      {user?.profileImage && user.profileImage !== "" && user.profileImage !== null ? (
+          <Image
+            source={{ uri: user?.profileImage }}
+            style={styles.image}
+          />
+        ) : (
+          <Ionicons name="person-circle-outline" size={80} color="#4CAF50" />
+        )}
+
+
         <Text style={styles.profileName}>{user?.username ?? ""}</Text>
         <Text style={styles.profileEmail}>{user?.email ?? ""}</Text>
-        <Text style={styles.profileEmail}>{user?.roles ?? ""}</Text>
+        <Text style={styles.profileEmail}>
+          {(user?.roles && user.roles.length > 0) ? user.roles.join('\n') : ''}
+        </Text>
+
       </View>
       {settingsOptions.map((item, index) => (
         <TouchableOpacity
@@ -109,6 +122,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     marginLeft: 10,
+  },
+  image: {
+    width: 60,
+    height: 60,
+    borderRadius: 12,
   },
 });
 

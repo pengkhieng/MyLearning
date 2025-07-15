@@ -261,19 +261,19 @@ const OrderScreen = () => {
                 </Text>
                 <Text style={styles.itemDesc}>Address: {order.address}</Text>
                 <Text style={styles.itemDesc}>Phone: {order.phone}</Text>
+                <Text style={styles.itemDesc}>Status: {order.status}</Text>
+                <Text style={styles.itemDesc}>Items: {order.items.map(item => `${item.itemName} (x${item.quantity})`).join(', ')}</Text>
                 <Text style={[
                   styles.itemDesc,
                   order.customTotalPrice > 0 ? { textDecorationLine: 'line-through', color: 'red' } : {}
                 ]}>
-                  Total: ${order.totalAmount}
+                  Total: ${order.totalAmount.toFixed(2)}
                 </Text>
                 {order.customTotalPrice > 0 && (
                   <Text style={[styles.itemDesc, { color: 'green' }]}>
-                    Special Total Price: ${order.customTotalPrice}
+                    Special Total Price: ${order.customTotalPrice.toFixed(2)}
                   </Text>
                 )}
-                <Text style={styles.itemDesc}>Status: {order.status}</Text>
-                <Text style={styles.itemDesc}>Items: {order.items.map(item => `${item.itemName} (x${item.quantity})`).join(', ')}</Text>
               </View>
               <View style={styles.buttonContainer}>
                 <TouchableOpacity

@@ -127,6 +127,23 @@ npm install --save-dev typescript @types/react @types/react-native
 
 ---
 
+## ✅ 1. Build APK
+```powershell
+cd android
+./gradlew assembleRelease
+
+```
+
+---
+
+## ✅ 2. Build AAB (Android App Bundle)
+```powershell
+cd android
+./gradlew bundleRelease
+```
+
+---
+
 ## ✅ Clean Build Android
 
 ```powershell
