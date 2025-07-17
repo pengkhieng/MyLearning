@@ -1,41 +1,44 @@
-import React, { useEffect, useRef, useState } from "react";
-import { ScrollView, View, Text, TouchableOpacity, StyleSheet, Animated, Image } from 'react-native';
+import React, { useEffect } from "react";
+import { ScrollView, View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { colors } from '../../utils/colors'
+import { colors } from '../../utils/colors';
 import CustomButton from "../../components/CustomButton";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User } from "../../types/authTypes";
+import { useProfile } from "../../hooks/useProfile";
 import { globalStyles } from "../../style/globalStyles";
-
+import ProfileImageWithEdit from '../../components/ProfileImageWithEdit';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type SettingScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setting'>;
 
 const SettingScreen = () => {
-
-  const buttonScale = useRef(new Animated.Value(1)).current;
   const navigation = useNavigation<SettingScreenNavigationProp>();
-
-  const [user, setUser] = useState<User | null>(null);
+  const { user, loading, error, handleImageChange } = useProfile();
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const userString = await AsyncStorage.getItem("user");
-      const userData: User | null = userString ? JSON.parse(userString) : null;
-      setUser(userData);
-    };
-
-    fetchUser();
-  }, []);
+    if (error) {
+      Alert.alert('Error', error);
+    }
+  }, [error]);
 
   const handleLogout = async () => {
     try {
-      await AsyncStorage.multiRemove(['accessToken', 'tokenExpiration', 'refreshToken', 'userId', 'username', 'email', 'roles']);
+      await AsyncStorage.multiRemove([
+        'accessToken',
+        'tokenExpiration',
+        'refreshToken',
+        'userId',
+        'username',
+        'email',
+        'roles',
+        'user',
+      ]);
       navigation.replace('Welcome');
     } catch (error) {
       console.error('Logout error:', error);
+      Alert.alert('Error', 'Failed to log out. Please try again.');
     }
   };
 
@@ -46,7 +49,7 @@ const SettingScreen = () => {
     { icon: 'notifications', label: 'Notifications', screen: 'Notifications' },
     { icon: 'help', label: 'Help', screen: 'Help' },
     { icon: 'information', label: 'About', screen: 'About' },
-  ];
+  ] as const;
 
   return (
     <ScrollView
@@ -54,29 +57,19 @@ const SettingScreen = () => {
       contentContainerStyle={globalStyles.contentContainer}
     >
       <View style={styles.profile}>
-
-      {user?.profileImage && user.profileImage !== "" && user.profileImage !== null ? (
-          <Image
-            source={{ uri: user?.profileImage }}
-            style={styles.image}
-          />
-        ) : (
-          <Ionicons name="person-circle-outline" size={80} color="#4CAF50" />
-        )}
-
-
-        <Text style={styles.profileName}>{user?.username ?? ""}</Text>
-        <Text style={styles.profileEmail}>{user?.email ?? ""}</Text>
+        {loading && <ActivityIndicator size="large" color={colors.primary} style={styles.loading} />}
+        <ProfileImageWithEdit user={user} onImageChange={handleImageChange} />
+        <Text style={styles.profileName}>{user?.username ?? 'N/A'}</Text>
+        <Text style={styles.profileEmail}>{user?.email ?? 'N/A'}</Text>
         <Text style={styles.profileEmail}>
-          {(user?.roles && user.roles.length > 0) ? user.roles.join('\n') : ''}
+          {user?.roles && user.roles.length > 0 ? user.roles.join(', ') : 'No roles'}
         </Text>
-
       </View>
       {settingsOptions.map((item, index) => (
         <TouchableOpacity
           key={index}
           style={styles.option}
-        // onPress={() => navigation.navigate(item.screen)}
+          // onPress={() => navigation.navigate(item.screen)}
         >
           <Ionicons name={item.icon} size={24} color="#000" />
           <Text style={styles.optionText}>{item.label}</Text>
@@ -103,7 +96,7 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#4CAF50',
+    color: colors.primary,
     marginTop: 10,
   },
   profileEmail: {
@@ -123,10 +116,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 10,
   },
-  image: {
-    width: 60,
-    height: 60,
-    borderRadius: 12,
+  loading: {
+    marginBottom: 10,
   },
 });
 

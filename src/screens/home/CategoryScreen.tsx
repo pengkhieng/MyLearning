@@ -226,7 +226,7 @@ const CategoryScreen = () => {
                 <Text style={styles.modalButtonText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.modalButton, styles.addButtonModal]} onPress={handleSubmit}>
-                <Text style={styles.modalButtonText}>{editingCategoryId ? 'Save' : 'Add'}</Text>
+                <Text style={styles.modalButtonText}>{editingCategoryId ? 'Update' : 'Add'}</Text>
               </TouchableOpacity>
             </View>
           </View>

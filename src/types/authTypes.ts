@@ -1,10 +1,12 @@
 import { BaseResponse } from "./baseResponseTypes";
 
+// Sent in the login request
 export interface LoginRequest {
   username: string;
   password: string;
 }
 
+// Represents the authenticated user
 export interface User {
   id: string;
   username: string;
@@ -13,6 +15,7 @@ export interface User {
   roles: string[];
 }
 
+// Returned from the login API
 export interface LoginData {
   user: User;
   refreshToken: string;
@@ -21,4 +24,5 @@ export interface LoginData {
   expiresIn: number;
 }
 
+// Full API response type
 export type LoginResponse = BaseResponse<LoginData>;

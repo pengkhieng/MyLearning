@@ -53,5 +53,9 @@
 	<array>
 		<string>Ionicons.ttf</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photo library to select a profile image.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>We need access to save images to your photo library.</string>
 </dict>
 </plist>

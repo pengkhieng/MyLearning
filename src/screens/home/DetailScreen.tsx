@@ -3,8 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
-  SafeAreaView,
+  ScrollView,
   StatusBar,
   TouchableOpacity,
 } from 'react-native';
@@ -36,45 +35,39 @@ const DetailScreen = ({ route }: any) => {
         </Text>
       ));
     } else if (Array.isArray(item)) {
-      return (
-        <FlatList
-          data={item}
-          keyExtractor={(_, idx) => idx.toString()}
-          renderItem={({ item }) => (
-            <View
-              style={[
-                styles.listItem,
-                { backgroundColor: colors ?? '#eee' },
-              ]}
-            >
-              {Object.entries(item).map(([key, val]) => (
-                <Text key={key} style={styles.itemText}>
-                  {key}: {String(val)}
-                </Text>
-              ))}
-            </View>
-          )}
-        />
-      );
+      return item.map((subItem, idx) => (
+        <View
+          key={idx.toString()}
+          style={[styles.listItem, { backgroundColor: colors ?? '#eee' }]}
+        >
+          {Object.entries(subItem).map(([key, val]) => (
+            <Text key={key} style={styles.itemText}>
+              {key}: {String(val)}
+            </Text>
+          ))}
+        </View>
+      ));
     } else {
       return <Text style={styles.itemText}>{JSON.stringify(item)}</Text>;
     }
   };
 
   return (
-    <SafeAreaView style={globalStyles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      <View style={styles.container}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={globalStyles.contentContainer}
+      >
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Ionicons name="chevron-back" size={24} color="#000" />
           </TouchableOpacity>
           <Text style={styles.title}>{title}</Text>
         </View>
-
         <View style={styles.content}>{renderValue(data, 0, color)}</View>
-      </View>
-    </SafeAreaView>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -83,7 +76,6 @@ export default DetailScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
   },
   header: {
     flexDirection: 'row',

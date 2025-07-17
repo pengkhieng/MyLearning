@@ -227,7 +227,7 @@ const OrderScreen = () => {
                   <Text style={styles.modalButtonText}>Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.modalButton, styles.addButtonModal]} onPress={handleSubmit}>
-                  <Text style={styles.modalButtonText}>{editingOrderId ? 'Save' : 'Add'}</Text>
+                  <Text style={styles.modalButtonText}>{editingOrderId ? 'Update' : 'Add'}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -376,7 +376,7 @@ const OrderScreen = () => {
                 <Text style={styles.modalButtonText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.modalButton, styles.addButtonModal]} onPress={handleSubmit}>
-                <Text style={styles.modalButtonText}>{editingOrderId ? 'Save' : 'Add'}</Text>
+                <Text style={styles.modalButtonText}>{editingOrderId ? 'Update' : 'Add'}</Text>
               </TouchableOpacity>
             </View>
           </View>

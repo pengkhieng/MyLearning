@@ -1,16 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { HttpMethod } from '../enum/HttpMethod';
 import { BaseResponse } from '../types/baseResponseTypes';
+import { ApiEndpoints } from '../constants/ApiEndpoints';
 
-const BASE_URL = 'https://khieng.online/api';
 const TIMEOUT = 10000;
 const ENABLE_LOGS = true;
-
-interface FetchOptions {
-  method: string;
-  headers: Record<string, string>;
-  body?: string;
-}
 
 export class ApiError extends Error {
   status?: number;
@@ -26,6 +20,7 @@ interface ApiRequestOptions {
   url: string;
   data?: any;
   requiresHeader?: boolean;
+  contentType?: string; // e.g., 'application/json' or 'multipart/form-data'
 }
 
 export const makeApiCall = async <T>({
@@ -33,25 +28,34 @@ export const makeApiCall = async <T>({
   url,
   data,
   requiresHeader = false,
+  contentType = 'application/json',
 }: ApiRequestOptions): Promise<BaseResponse<T>> => {
   const headers: Record<string, string> = {
     accept: '*/*',
-    'Content-Type': 'application/json',
   };
+
+  // Only add Content-Type for JSON; skip for multipart/form-data so fetch can set boundary automatically
+  if (contentType === 'application/json') {
+    headers['Content-Type'] = 'application/json';
+  }
 
   if (requiresHeader) {
     const token = await AsyncStorage.getItem('accessToken');
     if (!token) {
       throw new ApiError('No access token found', 401);
     }
-    headers.Authorization = `Bearer ${token}`;
+    headers['Authorization'] = `Bearer ${token}`;
   }
 
   if (ENABLE_LOGS) {
     console.group(`🌐 API Request: ${method} ${url}`);
     console.table({ Method: method, URL: url, Headers: headers });
     if (data && method !== HttpMethod.GET) {
-      console.log('📤 Request Body:', JSON.stringify(data, null, 2));
+      if (contentType === 'application/json') {
+        console.log('📤 Request Body:', JSON.stringify(data, null, 2));
+      } else if (contentType === 'multipart/form-data') {
+        console.log('📤 Request Body: FormData');
+      }
     }
     console.groupEnd();
   }
@@ -60,11 +64,23 @@ export const makeApiCall = async <T>({
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
 
   try {
-    const fullUrl = `${BASE_URL}${url.startsWith('/') ? url : `/${url}`}`;
+    const baseUrl = ApiEndpoints.BASE_URL.endsWith('/')
+      ? ApiEndpoints.BASE_URL.slice(0, -1)
+      : ApiEndpoints.BASE_URL;
+    const endpoint = url.startsWith('/') ? url : `/${url}`;
+    const fullUrl = baseUrl + endpoint;
+
+    const body =
+      contentType === 'application/json' && data && method !== HttpMethod.GET
+        ? JSON.stringify(data)
+        : data && method !== HttpMethod.GET
+        ? data
+        : undefined;
+
     const response = await fetch(fullUrl, {
       method,
       headers,
-      body: data && method !== HttpMethod.GET ? JSON.stringify(data) : undefined,
+      body,
       signal: controller.signal,
     });
 

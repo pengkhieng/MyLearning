@@ -3,26 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { makeApiCall } from '../api/apiClient';
 import { HttpMethod } from '../enum/HttpMethod';
 import { ApiEndpoints } from '../constants/ApiEndpoints';
-
-export interface OrderItem {
-  itemId: string;
-  itemName: string;
-  quantity: number;
-  unitPrice: number;
-}
-
-export interface Order {
-  id: string;
-  sellerId: string;
-  name: string;
-  address: string;
-  phone: string;
-  customTotalPrice: number;
-  items: OrderItem[];
-  totalAmount: number;
-  status: string;
-  createdAt: string;
-}
+import { Order } from '../types/Order'
 
 export const useOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
