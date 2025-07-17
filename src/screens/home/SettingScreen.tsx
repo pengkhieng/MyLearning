@@ -1,39 +1,41 @@
-import React, { useEffect } from "react";
-import { ScrollView, View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import React, { useEffect } from 'react';
+import { ScrollView, View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from "../../navigation/AppNavigator";
+import { RootStackParamList } from '../../navigation/AppNavigator';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../utils/colors';
-import CustomButton from "../../components/CustomButton";
-import { useProfile } from "../../hooks/useProfile";
-import { globalStyles } from "../../style/globalStyles";
+import CustomButton from '../../components/CustomButton';
+import { useProfile } from '../../hooks/useProfile';
+import { globalStyles } from '../../style/globalStyles';
 import ProfileImageWithEdit from '../../components/ProfileImageWithEdit';
+import { KKey } from '../../constants/ApiEndpoints';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type SettingScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setting'>;
 
 const SettingScreen = () => {
   const navigation = useNavigation<SettingScreenNavigationProp>();
-  const { user, loading, error, handleImageChange } = useProfile();
+  const { user, loading, error, handleImageChange, getUser } = useProfile();
+
+  useEffect(() => {
+    console.log('Running useEffect to call getUser'); // Debug log
+    getUser();
+  }, [getUser]);
 
   useEffect(() => {
     if (error) {
-      Alert.alert('Error', error);
+      Alert.alert('Error', error, [{ text: 'OK', onPress: () => {} }]);
     }
   }, [error]);
-
+  
   const handleLogout = async () => {
     try {
       await AsyncStorage.multiRemove([
-        'accessToken',
-        'tokenExpiration',
-        'refreshToken',
-        'userId',
-        'username',
-        'email',
-        'roles',
-        'user',
+        KKey.ACCESS_TOKEN,
+        KKey.REFRESH_TOKEN,
+        KKey.TOKEN_EXPRIATION,
+        KKey.USER,
       ]);
       navigation.replace('Welcome');
     } catch (error) {
@@ -57,7 +59,7 @@ const SettingScreen = () => {
       contentContainerStyle={globalStyles.contentContainer}
     >
       <View style={styles.profile}>
-        {loading && <ActivityIndicator size="large" color={colors.primary} style={styles.loading} />}
+        {/* {loading && <ActivityIndicator size="large" color={colors.primary} style={styles.loading} />} */}
         <ProfileImageWithEdit user={user} onImageChange={handleImageChange} />
         <Text style={styles.profileName}>{user?.username ?? 'N/A'}</Text>
         <Text style={styles.profileEmail}>{user?.email ?? 'N/A'}</Text>
@@ -70,6 +72,7 @@ const SettingScreen = () => {
           key={index}
           style={styles.option}
           // onPress={() => navigation.navigate(item.screen)}
+          disabled={loading}
         >
           <Ionicons name={item.icon} size={24} color="#000" />
           <Text style={styles.optionText}>{item.label}</Text>

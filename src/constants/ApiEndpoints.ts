@@ -42,3 +42,11 @@ export class ApiEndpoints {
     UPDATE: '/file/updateProfile',
   };
 }
+
+export class KKey {
+
+  static USER = 'user';
+  static ACCESS_TOKEN = 'accessToken';
+  static REFRESH_TOKEN = 'refreshToken';
+  static TOKEN_EXPRIATION = 'tokenExpiration';
+}
