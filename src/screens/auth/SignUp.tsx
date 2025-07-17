@@ -16,18 +16,19 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLogin } from '../../hooks/useLogin';
 import { colors } from '../../utils/colors';
 import { globalStyles } from '../../style/globalStyles';
 import CustomButton from '../../components/CustomButton';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
-const LoginScreen = () => {
-  const [username, setUsername] = useState('khieng');
-  const [password, setPassword] = useState('password');
+const SignUp = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [isUsernameFocused, setIsUsernameFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
@@ -45,25 +46,11 @@ const LoginScreen = () => {
   }, [fadeAnim]);
 
   const handleLogin = async () => {
-    try {
-      const response = await loginUser(username, password);
-      await AsyncStorage.setItem('accessToken', response.data?.accessToken ?? '');
-      await AsyncStorage.setItem('refreshToken', response.data?.refreshToken ?? '');
-
-      if (response.data?.user != null) {
-        await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
-      }
-      navigation.replace('Main');
-    } catch (err) {
-      Alert.alert('Login Failed', error || 'An error occurred during login');
-    }
+    navigation.replace('Login');
   };
 
   const handleForgotPassword = () => {
-    navigation.push('ForgotPassword');
-  };
-  const handleSignUp = () => {
-    navigation.push('SignUp');
+    Alert.alert('Forgot Password', 'This feature is not yet implemented.');
   };
 
   return (
@@ -77,6 +64,10 @@ const LoginScreen = () => {
     >
       <SafeAreaView style={{ flex: 1 }}>
         <StatusBar barStyle="dark-content" />
+
+         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                  <Ionicons name="chevron-back" size={24} color={colors.text} />
+                </TouchableOpacity>
         <KeyboardAvoidingView
           style={styles.keyboardAvoidingContainer}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -88,9 +79,9 @@ const LoginScreen = () => {
           >
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-                <Text style={styles.title}>Welcome Back! 👋</Text>
-                <Text style={styles.subtitle}>Sign in to your account</Text>
-
+                <Text style={styles.title}>Create an account! 👋</Text>
+                <Text style={styles.subtitle}>Welcome! Please enter your details.</Text>
+                <Text style={{marginBottom: 10}}>Name</Text>
                 <View style={[globalStyles.inputContainer, isUsernameFocused && globalStyles.inputFocused]}>
                   <TextInput
                     style={[globalStyles.input, isUsernameFocused && { borderColor: colors.primary }]}
@@ -104,6 +95,21 @@ const LoginScreen = () => {
                     onBlur={() => setIsUsernameFocused(false)}
                   />
                 </View>
+                <Text style={{marginBottom: 10}}>Email</Text>
+                <View style={[globalStyles.inputContainer, isUsernameFocused && globalStyles.inputFocused]}>
+                  <TextInput
+                    style={[globalStyles.input, isUsernameFocused && { borderColor: colors.primary }]}
+                    placeholder="Email"
+                    placeholderTextColor={colors.placeholderTxt}
+                    value={username}
+                    onChangeText={setUsername}
+                    keyboardType="default"
+                    autoCapitalize="none"
+                    onFocus={() => setIsUsernameFocused(true)}
+                    onBlur={() => setIsUsernameFocused(false)}
+                  />
+                </View>
+                <Text style={{marginBottom: 10}}>Password</Text>
                 <View style={[globalStyles.inputContainer, isPasswordFocused && globalStyles.inputFocused]}>
                   <TextInput
                     style={[globalStyles.input, isPasswordFocused && { borderColor: colors.primary }]}
@@ -117,13 +123,10 @@ const LoginScreen = () => {
                     onBlur={() => setIsPasswordFocused(false)}
                   />
                 </View>
-                <TouchableOpacity onPress={handleForgotPassword} style={styles.forgotPassword}>
-                  <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-                </TouchableOpacity>
                 {error && <Text style={styles.error}>{error}</Text>}
                 {data && <Text style={styles.success}>{data.message}</Text>}
                 <CustomButton
-                  title={loading ? 'Signing In...' : 'Sign In'}
+                  title={loading ? 'Signing Up...' : 'Sign Up'}
                   onPress={handleLogin}
                   animation="pulse"
                   duration={200}
@@ -134,9 +137,9 @@ const LoginScreen = () => {
               </Animated.View>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' ,marginVertical:20}}>
-              <Text>Don't have an account? </Text>
-              <TouchableOpacity onPress={handleSignUp} style={styles.signUp}>
-                <Text style={styles.forgotPasswordText}>Sign up</Text>
+              <Text>Already have an account? </Text>
+              <TouchableOpacity onPress={handleLogin} style={styles.signUp}>
+                <Text style={styles.forgotPasswordText}>Log In</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -188,6 +191,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
   },
+  backButton: {
+    position: 'absolute',
+    left: 20,
+    top: 60,
+    padding: 10,
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: 'white',
+    zIndex: 1,
+  },
 });
 
-export default LoginScreen;
+export default SignUp;

@@ -9,7 +9,10 @@ import WelcomeScreen from '../screens/onboarding/WelcomeScreen';
 import OnboardingScreen from '../screens/onboarding/OnboardingScreen';
 import DetailScreen from '../screens/home/DetailScreen';
 import { Dashboard } from '../models/home/dashboard';
-import { useLogin } from '../hooks/useLogin'; // ✅ Correct import
+import { useLogin } from '../hooks/useLogin';
+import SignUp from '../screens/auth/SignUp';
+import { KKey } from '../constants/ApiEndpoints';
+import ForgotPassword from '../screens/auth/ForgotPassword';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -17,6 +20,8 @@ export type RootStackParamList = {
   Welcome: undefined;
   Onboarding: undefined;
   Setting: undefined;
+  SignUp: undefined;
+  ForgotPassword: undefined;
   Detail: {
     title: string;
     data: Dashboard['summary'] | Dashboard['topProducts'] | Dashboard['dailySales'];
@@ -29,17 +34,16 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const AppNavigator = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { refreshToken } = useLogin(); // ✅ Use refreshToken from hook
-
+  const { refreshAccessToken } = useLogin();
   useEffect(() => {
     checkAuthStatus();
   }, []);
 
   const checkAuthStatus = async () => {
     try {
-      const token = await AsyncStorage.getItem('accessToken');
-      const tokenExpiration = await AsyncStorage.getItem('tokenExpiration');
-      const refreshTokenValue = await AsyncStorage.getItem('refreshToken');
+      const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
+      const tokenExpiration = await AsyncStorage.getItem(KKey.TOKEN_EXPRIATION);
+      const refreshTokenValue = await AsyncStorage.getItem(KKey.REFRESH_TOKEN);
 
       if (token && tokenExpiration && refreshTokenValue) {
         const expirationDate = new Date(parseInt(tokenExpiration));
@@ -48,16 +52,16 @@ const AppNavigator = () => {
 
         if (now.getTime() > expirationDate.getTime() + bufferTime) {
           try {
-            const refreshResponse = await refreshToken(); // ✅ Just call it
+            const refreshResponse = await refreshAccessToken();
             if (refreshResponse.data?.accessToken) {
               setIsLoggedIn(true);
             } else {
-              await AsyncStorage.multiRemove(['accessToken', 'tokenExpiration', 'refreshToken']);
+              await AsyncStorage.multiRemove([KKey.ACCESS_TOKEN, KKey.TOKEN_EXPRIATION, KKey.REFRESH_TOKEN,]);
               setIsLoggedIn(false);
             }
           } catch (refreshError) {
             console.error('❌ Token refresh failed:', refreshError);
-            await AsyncStorage.multiRemove(['accessToken', 'tokenExpiration', 'refreshToken']);
+            await AsyncStorage.multiRemove([KKey.ACCESS_TOKEN, KKey.TOKEN_EXPRIATION, KKey.REFRESH_TOKEN,]);
             setIsLoggedIn(false);
           }
         } else {
@@ -88,6 +92,8 @@ const AppNavigator = () => {
         <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Onboarding" component={OnboardingScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ headerShown: false }} />
         <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Detail" component={DetailScreen} options={{ headerShown: false }} />
       </Stack.Navigator>

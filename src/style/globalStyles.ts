@@ -39,7 +39,7 @@ export const globalStyles = StyleSheet.create({
         paddingBottom: 60,
     },
     inputContainer: {
-        marginBottom: 24,
+        marginBottom: 16,
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
         borderRadius: 12,
         shadowColor: '#000',
