@@ -3,16 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { makeApiCall } from '../api/apiClient';
 import { HttpMethod } from '../enum/HttpMethod';
 import { ApiEndpoints } from '../constants/ApiEndpoints';
-
-export interface Product {
-  itemId: string;
-  name: string;
-  description: string;
-  price: number;
-  categoryId: string;
-  stock: number;
-  active: boolean;
-}
+import { Product } from '../types/Product';
 
 export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);

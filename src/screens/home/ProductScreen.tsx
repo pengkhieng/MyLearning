@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, Platform, Dimensions, Alert, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useProducts, Product } from '../../hooks/useProduct';
+import { useProducts } from '../../hooks/useProduct';
+import { Product } from '../../types/Product';
 import { useCategories } from '../../hooks/useCategories';
 import { Category } from '../../types/categoryType';
 import { globalStyles } from '../../style/globalStyles';

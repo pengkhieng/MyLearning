@@ -2,19 +2,10 @@ import { useState, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { makeApiCall } from '../api/apiClient';
 import { HttpMethod } from '../enum/HttpMethod';
-import { User } from '../types/authTypes';
 import { ApiEndpoints } from '../constants/ApiEndpoints';
 import { KKey } from '../constants/ApiEndpoints';
-import mime from 'mime-types'; // Optional, only if used
-
-// Define the return type for the useProfile hook
-interface UseProfileReturn {
-  user: User | null;
-  loading: boolean;
-  error: string | null;
-  handleImageChange: (newImageUri: string) => Promise<void>;
-  getUser: () => Promise<User | null>;
-}
+import UseProfileReturn from '../types/UseProfileReturn';
+import { User } from '../types/User';
 
 export const useProfile = (): UseProfileReturn => {
   const [user, setUser] = useState<User | null>(null);
