@@ -55,5 +55,7 @@ export class KKey {
   static REFRESH_TOKEN = 'refreshToken';
   static TOKEN_EXPRIATION = 'tokenExpiration';
   static SUMMARY = 'summary';
-  
+  static ORDER = 'orders';
+  static CATEGORY = 'categories';
+  static PRODUCT = 'products';
 }

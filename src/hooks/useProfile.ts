@@ -67,7 +67,7 @@ export const useProfile = (): UseProfile => {
     setError(null);
 
     try {
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
       if (!token) {
         throw new Error('No access token found. Please log in.');
       }

@@ -2,8 +2,9 @@ import { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { makeApiCall } from '../api/apiClient';
 import { HttpMethod } from '../enum/HttpMethod';
-import { LoginResponse, LoginRequest, User ,LoginData} from '../types/AuthTypes';
+import { LoginResponse, LoginRequest ,LoginData} from '../types/AuthTypes';
 import { ApiEndpoints, KKey } from '../constants/ApiEndpoints';
+import { User } from '../types/User';
 
 export const useLogin = () => {
   const [loading, setLoading] = useState<boolean>(false);

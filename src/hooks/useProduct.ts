@@ -16,7 +16,7 @@ export const useProducts = () => {
 
     try {
       if (!forceRefresh) {
-        const cachedProducts = await AsyncStorage.getItem('products');
+        const cachedProducts = await AsyncStorage.getItem(KKey.PRODUCT);
         if (cachedProducts) {
           setProducts(JSON.parse(cachedProducts));
           setLoading(false);
@@ -37,7 +37,7 @@ export const useProducts = () => {
 
       const data = response.data || [];
       setProducts(data);
-      await AsyncStorage.setItem('products', JSON.stringify(data));
+      await AsyncStorage.setItem(KKey.PRODUCT, JSON.stringify(data));
     } catch (err: any) {
       const errorMessage =
         err.status === 401
@@ -54,7 +54,7 @@ export const useProducts = () => {
     setError(null);
 
     try {
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
       if (!token) {
         throw new Error('No access token found. Please log in.');
       }
@@ -80,7 +80,7 @@ export const useProducts = () => {
       const newProduct: Product = response.data;
       setProducts((prevProducts) => {
         const updatedProducts = [...prevProducts, newProduct];
-        AsyncStorage.setItem('products', JSON.stringify(updatedProducts)).catch((err) =>
+        AsyncStorage.setItem(KKey.PRODUCT, JSON.stringify(updatedProducts)).catch((err) =>
           console.error('Failed to update AsyncStorage:', err)
         );
         return updatedProducts;
@@ -101,7 +101,7 @@ export const useProducts = () => {
     setError(null);
 
     try {
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
       if (!token) {
         throw new Error('No access token found. Please log in.');
       }
@@ -129,7 +129,7 @@ export const useProducts = () => {
         const updatedProducts = prevProducts.map((prod) =>
           prod.itemId === id ? updatedProduct : prod
         );
-        AsyncStorage.setItem('products', JSON.stringify(updatedProducts)).catch((err) =>
+        AsyncStorage.setItem(KKey.PRODUCT, JSON.stringify(updatedProducts)).catch((err) =>
           console.error('Failed to update AsyncStorage:', err)
         );
         return updatedProducts;
@@ -150,7 +150,7 @@ export const useProducts = () => {
     setError(null);
 
     try {
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
       if (!token) {
         throw new Error('No access token found. Please log in.');
       }
@@ -163,7 +163,7 @@ export const useProducts = () => {
 
       setProducts((prevProducts) => {
         const updatedProducts = prevProducts.filter((prod) => prod.itemId !== id);
-        AsyncStorage.setItem('products', JSON.stringify(updatedProducts)).catch((err) =>
+        AsyncStorage.setItem(KKey.PRODUCT, JSON.stringify(updatedProducts)).catch((err) =>
           console.error('Failed to update AsyncStorage:', err)
         );
         return updatedProducts;

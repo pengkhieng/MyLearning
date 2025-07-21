@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { HttpMethod } from '../enum/HttpMethod';
 import { BaseResponse } from '../types/BaseResponseTypes';
-import { ApiEndpoints } from '../constants/ApiEndpoints';
+import { ApiEndpoints, KKey } from '../constants/ApiEndpoints';
 
 const TIMEOUT = 10000;
 const ENABLE_LOGS = true;
@@ -40,7 +40,7 @@ export const makeApiCall = async <T>({
   }
 
   if (requiresHeader) {
-    const token = await AsyncStorage.getItem('accessToken');
+    const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
     if (!token) {
       throw new ApiError('No access token found', 401);
     }

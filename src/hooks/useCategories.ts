@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { makeApiCall } from '../api/apiClient';
 import { HttpMethod } from '../enum/HttpMethod';
-import { ApiEndpoints } from '../constants/ApiEndpoints';
+import { ApiEndpoints, KKey } from '../constants/ApiEndpoints';
 import { Category } from '../types/CategoryType';
 
 export const useCategories = () => {
@@ -16,7 +16,7 @@ export const useCategories = () => {
 
     try {
       if (!forceRefresh) {
-        const cachedCategories = await AsyncStorage.getItem('categories');
+        const cachedCategories = await AsyncStorage.getItem(KKey.CATEGORY);
         if (cachedCategories) {
           setCategories(JSON.parse(cachedCategories));
           setLoading(false);
@@ -24,7 +24,7 @@ export const useCategories = () => {
         }
       }
 
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
       if (!token) {
         throw new Error('No access token found. Please log in.');
       }
@@ -37,7 +37,7 @@ export const useCategories = () => {
 
       const data = response.data || [];
       setCategories(data);
-      await AsyncStorage.setItem('categories', JSON.stringify(data));
+      await AsyncStorage.setItem(KKey.CATEGORY, JSON.stringify(data));
     } catch (err: any) {
       const errorMessage =
         err.status === 401
@@ -54,7 +54,7 @@ export const useCategories = () => {
     setError(null);
 
     try {
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
       if (!token) {
         throw new Error('No access token found. Please log in.');
       }
@@ -76,7 +76,7 @@ export const useCategories = () => {
       const newCategory: Category = response.data;
       setCategories((prevCategories) => {
         const updatedCategories = [...prevCategories, newCategory];
-        AsyncStorage.setItem('categories', JSON.stringify(updatedCategories)).catch((err) =>
+        AsyncStorage.setItem(KKey.CATEGORY, JSON.stringify(updatedCategories)).catch((err) =>
           console.error('Failed to update AsyncStorage:', err)
         );
         return updatedCategories;
@@ -97,7 +97,7 @@ export const useCategories = () => {
     setError(null);
 
     try {
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
       if (!token) {
         throw new Error('No access token found. Please log in.');
       }
@@ -121,7 +121,7 @@ export const useCategories = () => {
         const updatedCategories = prevCategories.map((cat) =>
           cat.id === id ? updatedCategory : cat
         );
-        AsyncStorage.setItem('categories', JSON.stringify(updatedCategories)).catch((err) =>
+        AsyncStorage.setItem(KKey.CATEGORY, JSON.stringify(updatedCategories)).catch((err) =>
           console.error('Failed to update AsyncStorage:', err)
         );
         return updatedCategories;
@@ -142,7 +142,7 @@ export const useCategories = () => {
     setError(null);
 
     try {
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
       if (!token) {
         throw new Error('No access token found. Please log in.');
       }
@@ -155,7 +155,7 @@ export const useCategories = () => {
 
       setCategories((prevCategories) => {
         const updatedCategories = prevCategories.filter((cat) => cat.id !== id);
-        AsyncStorage.setItem('categories', JSON.stringify(updatedCategories)).catch((err) =>
+        AsyncStorage.setItem(KKey.CATEGORY, JSON.stringify(updatedCategories)).catch((err) =>
           console.error('Failed to update AsyncStorage:', err)
         );
         return updatedCategories;

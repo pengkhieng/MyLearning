@@ -22,6 +22,7 @@ import { colors } from '../../utils/colors';
 import { globalStyles } from '../../style/globalStyles';
 import CustomButton from '../../components/CustomButton';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
+import { KKey } from '../../constants/ApiEndpoints';
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -47,11 +48,11 @@ const LoginScreen = () => {
   const handleLogin = async () => {
     try {
       const response = await loginUser(username, password);
-      await AsyncStorage.setItem('accessToken', response.data?.accessToken ?? '');
-      await AsyncStorage.setItem('refreshToken', response.data?.refreshToken ?? '');
+      await AsyncStorage.setItem(KKey.ACCESS_TOKEN, response.data?.accessToken ?? '');
+      await AsyncStorage.setItem(KKey.REFRESH_TOKEN, response.data?.refreshToken ?? '');
 
       if (response.data?.user != null) {
-        await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
+        await AsyncStorage.setItem(KKey.USER, JSON.stringify(response.data.user));
       }
       navigation.replace('Main');
     } catch (err) {

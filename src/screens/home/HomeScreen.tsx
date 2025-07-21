@@ -34,6 +34,22 @@ const HomeScreen = () => {
     { label: 'Inactive Items', value: summary[0]?.inactiveItems || 0 , colors: colors.dashboard[5]},
   ];
 
+    if (loading) {
+      return (
+        <View style={[globalStyles.contentContainer, styles.centered]}>
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      );
+    }
+  
+    if (error) {
+      return (
+        <View style={[globalStyles.contentContainer, styles.centered]}>
+          <Text style={styles.errorText}>Error: {error}</Text>
+        </View>
+      );
+    }
+
   return (
     <View>
       <StatusBar barStyle="dark-content" />
@@ -42,8 +58,6 @@ const HomeScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={globalStyles.contentContainer}
       >
-        {loading && <Text>Loading...</Text>}
-        {error && <Text style={{ color: 'red' }}>{error}</Text>}
         <View style={styles.cardGrid}>
           {summaryItems.map((item, index) => (
             <TouchableOpacity
@@ -51,7 +65,7 @@ const HomeScreen = () => {
               style={[styles.card, { backgroundColor: item.colors }]}
             >
               <Text style={styles.cardText}>{item.label}</Text>
-              <Text style={styles.cardText}>{item.value}</Text>
+              <Text style={styles.cardValue}>{item.value}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -74,11 +88,29 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 16,
     alignItems: 'center',
-    paddingVertical: 40,
+    paddingVertical: 26,
   },
   cardText: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'white',
+    color: colors.primary,
+  },
+  cardValue: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: 'gray',
+  },
+  errorText: {
+    fontSize: 16,
+    color: 'red',
   },
 });

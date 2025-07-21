@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { makeApiCall } from '../api/apiClient';
 import { HttpMethod } from '../enum/HttpMethod';
-import { ApiEndpoints } from '../constants/ApiEndpoints';
+import { ApiEndpoints, KKey } from '../constants/ApiEndpoints';
 import { Order } from '../types/Order'
 
 export const useOrders = () => {
@@ -16,7 +16,7 @@ export const useOrders = () => {
 
     try {
       if (!forceRefresh) {
-        const cachedOrders = await AsyncStorage.getItem('orders');
+        const cachedOrders = await AsyncStorage.getItem(KKey.ORDER);
         if (cachedOrders) {
           setOrders(JSON.parse(cachedOrders));
           setLoading(false);
@@ -24,7 +24,7 @@ export const useOrders = () => {
         }
       }
 
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
       if (!token) {
         throw new Error('No access token found. Please log in.');
       }
@@ -37,7 +37,7 @@ export const useOrders = () => {
 
       const data = response.data || [];
       setOrders(data);
-      await AsyncStorage.setItem('orders', JSON.stringify(data));
+      await AsyncStorage.setItem(KKey.ORDER, JSON.stringify(data));
     } catch (err: any) {
       const errorMessage =
         err.status === 401
@@ -54,7 +54,7 @@ export const useOrders = () => {
     setError(null);
 
     try {
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
       if (!token) {
         throw new Error('No access token found. Please log in.');
       }
@@ -79,7 +79,7 @@ export const useOrders = () => {
       const newOrder: Order = response.data;
       setOrders((prevOrders) => {
         const updatedOrders = [...prevOrders, newOrder];
-        AsyncStorage.setItem('orders', JSON.stringify(updatedOrders)).catch((err) =>
+        AsyncStorage.setItem(KKey.ORDER, JSON.stringify(updatedOrders)).catch((err) =>
           console.error('Failed to update AsyncStorage:', err)
         );
         return updatedOrders;
@@ -100,7 +100,7 @@ export const useOrders = () => {
     setError(null);
 
     try {
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
       if (!token) {
         throw new Error('No access token found. Please log in.');
       }
@@ -127,7 +127,7 @@ export const useOrders = () => {
         const updatedOrders = prevOrders.map((ord) =>
           ord.id === id ? updatedOrder : ord
         );
-        AsyncStorage.setItem('orders', JSON.stringify(updatedOrders)).catch((err) =>
+        AsyncStorage.setItem(KKey.ORDER, JSON.stringify(updatedOrders)).catch((err) =>
           console.error('Failed to update AsyncStorage:', err)
         );
         return updatedOrders;
@@ -148,7 +148,7 @@ export const useOrders = () => {
     setError(null);
 
     try {
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
       if (!token) {
         throw new Error('No access token found. Please log in.');
       }
@@ -161,7 +161,7 @@ export const useOrders = () => {
 
       setOrders((prevOrders) => {
         const updatedOrders = prevOrders.filter((ord) => ord.id !== id);
-        AsyncStorage.setItem('orders', JSON.stringify(updatedOrders)).catch((err) =>
+        AsyncStorage.setItem(KKey.ORDER, JSON.stringify(updatedOrders)).catch((err) =>
           console.error('Failed to update AsyncStorage:', err)
         );
         return updatedOrders;
