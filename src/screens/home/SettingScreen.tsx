@@ -61,8 +61,8 @@ const SettingScreen = () => {
       <View style={styles.profile}>
         {/* {loading && <ActivityIndicator size="large" color={colors.primary} style={styles.loading} />} */}
         <ProfileImageWithEdit user={user} onImageChange={handleImageChange} />
-        <Text style={styles.profileName}>{user?.username ?? 'N/A'}</Text>
-        <Text style={styles.profileEmail}>{user?.email ?? 'N/A'}</Text>
+        <Text style={styles.profileName}>Username: {user?.username ?? 'N/A'}</Text>
+        <Text style={styles.profileEmail}>Email: {user?.email ?? 'N/A'}</Text>
         <Text style={styles.profileEmail}>
           {user?.roles && user.roles.length > 0 ? user.roles.join(', ') : 'No roles'}
         </Text>
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: colors.primary,
+    color: colors.orangeWithOpacity,
     marginTop: 10,
   },
   profileEmail: {
