@@ -1,4 +1,4 @@
-import { BaseResponse } from "./baseResponseTypes";
+import { BaseResponse } from "./BaseResponseTypes";
 
 export interface Category {
   id: string;

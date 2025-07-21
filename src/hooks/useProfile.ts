@@ -4,10 +4,10 @@ import { makeApiCall } from '../api/apiClient';
 import { HttpMethod } from '../enum/HttpMethod';
 import { ApiEndpoints } from '../constants/ApiEndpoints';
 import { KKey } from '../constants/ApiEndpoints';
-import UseProfileReturn from '../types/UseProfileReturn';
+import UseProfile from '../types/UseProfile';
 import { User } from '../types/User';
 
-export const useProfile = (): UseProfileReturn => {
+export const useProfile = (): UseProfile => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,10 +18,9 @@ export const useProfile = (): UseProfileReturn => {
       setError(null);
       console.log('Fetching user from AsyncStorage'); // Debug log
       const userJson = await AsyncStorage.getItem(KKey.USER);
-      console.log('Stored userJson:', userJson); // Debug stored data
+      console.log('Stored userJson:', userJson);
       if (userJson) {
         const parsedUser = JSON.parse(userJson) as User;
-        // Only update state if user data has changed
         setUser(prev => {
           if (JSON.stringify(prev) !== JSON.stringify(parsedUser)) {
             console.log('Updating user state:', parsedUser); // Debug state update

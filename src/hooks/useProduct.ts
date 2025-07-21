@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { makeApiCall } from '../api/apiClient';
 import { HttpMethod } from '../enum/HttpMethod';
-import { ApiEndpoints } from '../constants/ApiEndpoints';
+import { ApiEndpoints, KKey } from '../constants/ApiEndpoints';
 import { Product } from '../types/Product';
 
 export const useProducts = () => {
@@ -24,7 +24,7 @@ export const useProducts = () => {
         }
       }
 
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
       if (!token) {
         throw new Error('No access token found. Please log in.');
       }

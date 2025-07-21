@@ -1,6 +1,6 @@
 import { User } from './User';
 
-interface UseProfileReturn {
+interface UseProfile {
   user: User | null;
   loading: boolean;
   error: string | null;
@@ -8,4 +8,4 @@ interface UseProfileReturn {
   getUser: () => Promise<User | null>;
 }
 
-export default UseProfileReturn;
+export default UseProfile;

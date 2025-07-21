@@ -2,7 +2,7 @@ import { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { makeApiCall } from '../api/apiClient';
 import { HttpMethod } from '../enum/HttpMethod';
-import { LoginResponse, LoginRequest, User ,LoginData} from '../types/authTypes';
+import { LoginResponse, LoginRequest, User ,LoginData} from '../types/AuthTypes';
 import { ApiEndpoints, KKey } from '../constants/ApiEndpoints';
 
 export const useLogin = () => {

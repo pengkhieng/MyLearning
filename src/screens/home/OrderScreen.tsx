@@ -1,12 +1,14 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, Platform, Dimensions, Alert, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useOrders, Order, OrderItem } from '../../hooks/useOrders';
-import { useProducts, Product } from '../../hooks/useProduct';
+import { useOrders } from '../../hooks/useOrders';
+import { useProducts } from '../../hooks/useProduct';
 import { globalStyles } from '../../style/globalStyles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Picker } from '@react-native-picker/picker';
 import { colors } from '../../utils/colors'
+import { Order } from '../../types/Order';
+import { Product } from '../../types/Product';
 
 const OrderScreen = () => {
   const { orders, loading, error, fetchOrders, addOrder, editOrder, deleteOrder } = useOrders();

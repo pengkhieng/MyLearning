@@ -41,12 +41,19 @@ export class ApiEndpoints {
   static readonly PROFILE = {
     UPDATE: '/file/updateProfile',
   };
+
+  static readonly DASHBOARD = {
+    CATEGORY: '/dashboard/categories',
+    LOW_STOCK: '/dashboard/low-stock',
+    SUMMARY: '/dashboard/summary',
+  };
 }
 
 export class KKey {
-
   static USER = 'user';
   static ACCESS_TOKEN = 'accessToken';
   static REFRESH_TOKEN = 'refreshToken';
   static TOKEN_EXPRIATION = 'tokenExpiration';
+  static SUMMARY = 'summary';
+  
 }

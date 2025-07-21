@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { makeApiCall } from '../api/apiClient';
 import { HttpMethod } from '../enum/HttpMethod';
 import { ApiEndpoints } from '../constants/ApiEndpoints';
-import { Category } from '../types/categoryType';
+import { Category } from '../types/CategoryType';
 
 export const useCategories = () => {
   const [categories, setCategories] = useState<Category[]>([]);

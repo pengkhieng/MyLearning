@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { HttpMethod } from '../enum/HttpMethod';
-import { BaseResponse } from '../types/baseResponseTypes';
+import { BaseResponse } from '../types/BaseResponseTypes';
 import { ApiEndpoints } from '../constants/ApiEndpoints';
 
 const TIMEOUT = 10000;

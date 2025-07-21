@@ -1,4 +1,4 @@
-import { BaseResponse } from "./baseResponseTypes";
+import { BaseResponse } from "./BaseResponseTypes";
 import { User } from "./User";
 
 export interface LoginRequest {

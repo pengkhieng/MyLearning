@@ -4,7 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useProducts } from '../../hooks/useProduct';
 import { Product } from '../../types/Product';
 import { useCategories } from '../../hooks/useCategories';
-import { Category } from '../../types/categoryType';
+import { Category } from '../../types/CategoryType';
 import { globalStyles } from '../../style/globalStyles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Picker } from '@react-native-picker/picker';
