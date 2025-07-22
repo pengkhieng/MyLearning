@@ -13,6 +13,8 @@ import { useLogin } from '../hooks/useLogin';
 import SignUp from '../screens/auth/SignUp';
 import { KKey } from '../constants/ApiEndpoints';
 import ForgotPassword from '../screens/auth/ForgotPassword';
+import VerifyCode from '../screens/auth/VerifyCode';
+import UserModel from '../types/UserModel';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -22,6 +24,7 @@ export type RootStackParamList = {
   Setting: undefined;
   SignUp: undefined;
   ForgotPassword: undefined;
+  VerifyCode: { user: UserModel };
   Detail: {
     title: string;
     data: Dashboard['summary'] | Dashboard['topProducts'] | Dashboard['dailySales'];
@@ -56,12 +59,12 @@ const AppNavigator = () => {
             if (refreshResponse.data?.accessToken) {
               setIsLoggedIn(true);
             } else {
-              await AsyncStorage.multiRemove([KKey.ACCESS_TOKEN, KKey.TOKEN_EXPRIATION, KKey.REFRESH_TOKEN,]);
+              await AsyncStorage.clear();
               setIsLoggedIn(false);
             }
           } catch (refreshError) {
             console.error('❌ Token refresh failed:', refreshError);
-            await AsyncStorage.multiRemove([KKey.ACCESS_TOKEN, KKey.TOKEN_EXPRIATION, KKey.REFRESH_TOKEN,]);
+            await AsyncStorage.clear();
             setIsLoggedIn(false);
           }
         } else {
@@ -96,6 +99,7 @@ const AppNavigator = () => {
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ headerShown: false }} />
         <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Detail" component={DetailScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="VerifyCode" component={VerifyCode} options={{ headerShown: false }} />        
       </Stack.Navigator>
     </NavigationContainer>
   );

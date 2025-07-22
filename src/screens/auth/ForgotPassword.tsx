@@ -31,11 +31,10 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
-  const { loginUser, loading, error, data } = useLogin();
+  const { resetPassword, loading, error, data } = useLogin();
   const navigation = useNavigation<ForgotPasswordNavigationProp>();
 
-  const isDisable = email === '' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); // Basic email validation
-
+  const isDisable = email === '' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -47,6 +46,7 @@ const ForgotPassword = () => {
   const handleSendResetCode = async () => {
     try {
       Alert.alert('Success', 'A password reset code has been sent to your email.');
+      navigation.push('VerifyCode');
       // Optionally navigate to a screen to enter the reset code
     } catch (err) {
       Alert.alert('Error', error || 'An error occurred while sending the reset code.');

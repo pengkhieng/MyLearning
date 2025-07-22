@@ -67,12 +67,7 @@ export const useLogin = () => {
       const errorMessage = err instanceof Error ? err.message : 'Login failed';
       setError(errorMessage);
       // Clear all stored data on error
-      await AsyncStorage.multiRemove([
-        KKey.ACCESS_TOKEN,
-        KKey.REFRESH_TOKEN,
-        KKey.TOKEN_EXPRIATION,
-        KKey.USER,
-      ]);
+      await AsyncStorage.clear();
       throw new Error(errorMessage);
     } finally {
       setLoading(false);
@@ -122,17 +117,98 @@ export const useLogin = () => {
       const errorMessage = err instanceof Error ? err.message : 'Token refresh failed';
       setError(errorMessage);
       // Clear all stored data on error
-      await AsyncStorage.multiRemove([
-        KKey.ACCESS_TOKEN,
-        KKey.REFRESH_TOKEN,
-        KKey.TOKEN_EXPRIATION,
-        KKey.USER,
-      ]);
+      await AsyncStorage.clear();
       throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  return { loginUser, refreshAccessToken, loading, error, data };
+  // Login function
+  const signUpUser = async (username: string, email: string, password: string,verificationCode: string ): Promise<LoginResponse> => {
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const request = { username, email , password , verificationCode};
+      
+      // Use LoginData as the generic type since makeApiCall returns BaseResponse<LoginData>
+      const response = await makeApiCall<LoginData>({
+        method: HttpMethod.POST,
+        url: ApiEndpoints.AUTH.REGISTER,
+        data: request,
+      });
+
+      // response.data is LoginData; response is BaseResponse<LoginData> (i.e., LoginResponse)
+      const loginData = response.data;
+
+      if (loginData) {
+        const { accessToken, refreshToken, expiresIn, user } = loginData;
+
+        // Store tokens and expiration
+        await AsyncStorage.setItem(KKey.ACCESS_TOKEN, accessToken);
+        await AsyncStorage.setItem(KKey.REFRESH_TOKEN, refreshToken);
+        const expirationDate = Date.now() + expiresIn * 1000;
+        await AsyncStorage.setItem(KKey.TOKEN_EXPRIATION, expirationDate.toString());
+
+        // Store user
+        await storeUser(user);
+
+        setData(response);
+      } else {
+        throw new Error('Invalid response structure');
+      }
+
+      return response;
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Login failed';
+      setError(errorMessage);
+      // Clear all stored data on error
+      await AsyncStorage.clear();
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Login function
+  const requestVerification = async (email: string): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+  
+    try {
+      const request = { email };
+  
+      const response = await makeApiCall({
+        method: HttpMethod.POST,
+        url: ApiEndpoints.AUTH.REQUEST_VERIFICATION,
+        data: request,
+        requiresHeader: false,
+      });
+  
+      // Assuming response is of type BaseResponse<LoginData>
+      console.log('Response:', response);
+  
+      return true;
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Sent code failed';
+      setError(errorMessage);
+  
+      // Clear all stored data on error
+      await AsyncStorage.clear();
+  
+      return false; // You don't need to throw if you're returning a boolean
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
+  const resetPassword = async (email: string, verificationCode: string, password: string): Promise<string> => {
+    return '';
+  }
+  
+
+  return { loginUser, refreshAccessToken, signUpUser, requestVerification, resetPassword, loading, error, data };
 };

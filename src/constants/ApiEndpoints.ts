@@ -9,6 +9,8 @@ export class ApiEndpoints {
     REFRESH: '/auth/refresh',
     LOGOUT: '/auth/logout',
     VERIFY_TOKEN: '/protected',
+    REGISTER: '/auth/register',
+    REQUEST_VERIFICATION: '/email/request-verification',
   };
 
   static readonly USER = {

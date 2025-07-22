@@ -31,12 +31,7 @@ const SettingScreen = () => {
   
   const handleLogout = async () => {
     try {
-      await AsyncStorage.multiRemove([
-        KKey.ACCESS_TOKEN,
-        KKey.REFRESH_TOKEN,
-        KKey.TOKEN_EXPRIATION,
-        KKey.USER,
-      ]);
+      await AsyncStorage.clear();
       navigation.replace('Welcome');
     } catch (error) {
       console.error('Logout error:', error);

@@ -22,20 +22,36 @@ import { globalStyles } from '../../style/globalStyles';
 import CustomButton from '../../components/CustomButton';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import UserModel from '../../types/UserModel';
 
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
 const SignUp = () => {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isUsernameFocused, setIsUsernameFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
-  const { loginUser, loading, error, data } = useLogin();
+  const { requestVerification, loading, error, data } = useLogin();
   const navigation = useNavigation<LoginScreenNavigationProp>();
 
   const isDisable = username === '' || password === '';
+ 
+  const user = new UserModel(username, email, password);
+
+const handleSigning = async () => {
+
+  const value: boolean = await requestVerification(email);
+  if (value) {
+    navigation.navigate('VerifyCode', { user });
+  }
+
+};
+
+
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -45,9 +61,6 @@ const SignUp = () => {
     }).start();
   }, [fadeAnim]);
 
-  const handleLogin = async () => {
-    navigation.replace('Login');
-  };
 
   const handleForgotPassword = () => {
     Alert.alert('Forgot Password', 'This feature is not yet implemented.');
@@ -96,17 +109,17 @@ const SignUp = () => {
                   />
                 </View>
                 <Text style={{marginBottom: 10}}>Email</Text>
-                <View style={[globalStyles.inputContainer, isUsernameFocused && globalStyles.inputFocused]}>
+                <View style={[globalStyles.inputContainer, isEmailFocused && globalStyles.inputFocused]}>
                   <TextInput
-                    style={[globalStyles.input, isUsernameFocused && { borderColor: colors.primary }]}
+                    style={[globalStyles.input, isEmailFocused && { borderColor: colors.primary }]}
                     placeholder="Email"
                     placeholderTextColor={colors.placeholderTxt}
-                    value={username}
-                    onChangeText={setUsername}
+                    value={email}
+                    onChangeText={setEmail}
                     keyboardType="default"
                     autoCapitalize="none"
-                    onFocus={() => setIsUsernameFocused(true)}
-                    onBlur={() => setIsUsernameFocused(false)}
+                    onFocus={() => setIsEmailFocused(true)}
+                    onBlur={() => setIsEmailFocused(false)}
                   />
                 </View>
                 <Text style={{marginBottom: 10}}>Password</Text>
@@ -127,7 +140,7 @@ const SignUp = () => {
                 {data && <Text style={styles.success}>{data.message}</Text>}
                 <CustomButton
                   title={loading ? 'Signing Up...' : 'Sign Up'}
-                  onPress={handleLogin}
+                  onPress={handleSigning}
                   animation="pulse"
                   duration={200}
                   isDisabled={isDisable || loading}
@@ -138,7 +151,7 @@ const SignUp = () => {
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' ,marginVertical:20}}>
               <Text>Already have an account? </Text>
-              <TouchableOpacity onPress={handleLogin} style={styles.signUp}>
+              <TouchableOpacity onPress={() => {navigation.replace('Login')}} style={styles.signUp}>
                 <Text style={styles.forgotPasswordText}>Log In</Text>
               </TouchableOpacity>
             </View>
