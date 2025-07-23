@@ -203,6 +203,37 @@ export const useLogin = () => {
     }
   };
 
+  const resendVerification = async (email: string): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+  
+    try {
+      const request = { email };
+  
+      const response = await makeApiCall({
+        method: HttpMethod.POST,
+        url: ApiEndpoints.AUTH.RESEND_VERIFICATION,
+        data: request,
+        requiresHeader: false,
+      });
+  
+      // Assuming response is of type BaseResponse<LoginData>
+      console.log('Response:', response);
+  
+      return true;
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Sent code failed';
+      setError(errorMessage);
+  
+      // Clear all stored data on error
+      await AsyncStorage.clear();
+  
+      return false; // You don't need to throw if you're returning a boolean
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const forgotPassword = async (email: string): Promise<boolean> => {
     setLoading(true);
     setError(null);
@@ -268,5 +299,5 @@ export const useLogin = () => {
   
   
 
-  return { loginUser, refreshAccessToken, signUpUser, requestVerification,forgotPassword, resetPassword, loading, error, data };
+  return { loginUser, refreshAccessToken, signUpUser,resendVerification, requestVerification,forgotPassword, resetPassword, loading, error, data };
 };

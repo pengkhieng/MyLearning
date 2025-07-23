@@ -11,6 +11,7 @@ export class ApiEndpoints {
     VERIFY_TOKEN: '/protected',
     REGISTER: '/auth/register',
     REQUEST_VERIFICATION: '/email/request-verification',
+    RESEND_VERIFICATION: '/email/resend-verification',
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
 

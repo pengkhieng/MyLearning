@@ -197,13 +197,6 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 16,
   },
-  forgotPassword: {
-    marginBottom: 10,
-    alignSelf: 'flex-end',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 5,
-  },
   signUpContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -218,6 +211,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.customDarkBlue,
     fontWeight: '600',
+  },
+  forgotPassword: {
+    marginBottom: 10,
+    alignSelf: 'flex-end',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5,
   },
   forgotPasswordText: {
     fontSize: 16,

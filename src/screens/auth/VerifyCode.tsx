@@ -32,7 +32,7 @@ const VerifyCode = () => {
   const [code, setCode] = useState('');
   const [isCodeFocused, setIsCodeFocused] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
-  const { signUpUser, loading, error, data } = useLogin();
+  const { signUpUser, resendVerification, loading, error, data } = useLogin();
   const navigation = useNavigation<VerifyCodeNavigationProp>();
   const route = useRoute<VerifyCodeRouteProp>();
   const { user } = route.params;
@@ -46,6 +46,10 @@ const VerifyCode = () => {
       useNativeDriver: true,
     }).start();
   }, [fadeAnim]);
+
+  const resentCode = async () => {
+    resendVerification(user.email)
+  }
 
   const handleVerifyCode = async () => {
     if (!code) {
@@ -113,9 +117,9 @@ const VerifyCode = () => {
                     onBlur={() => setIsCodeFocused(false)}
                   />
                 </View>
-
-                {error && <Text style={styles.error}>{error}</Text>}
-                {data && <Text style={styles.success}>{data.message}</Text>}
+                <TouchableOpacity onPress={resentCode} style={[styles.resentCode]}>
+                  <Text style={[styles.resentCodeText]}>Sent again</Text>
+                </TouchableOpacity>
 
                 <CustomButton
                   title={loading ? 'Verifying...' : 'Verify Code'}
@@ -188,6 +192,18 @@ const styles = StyleSheet.create({
     color: 'green',
     marginBottom: 10,
     textAlign: 'center',
+  },
+  resentCode: {
+    marginBottom: 10,
+    alignSelf: 'flex-end',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5,
+  },
+  resentCodeText: {
+    fontSize: 16,
+    color: colors.customDarkBlue,
+    fontWeight: '400',
   },
 });
 
