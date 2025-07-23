@@ -2,7 +2,7 @@ import { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { makeApiCall } from '../api/apiClient';
 import { HttpMethod } from '../enum/HttpMethod';
-import { LoginResponse, LoginRequest ,LoginData} from '../types/AuthTypes';
+import { LoginResponse, LoginRequest ,LoginData, ResetPasswordRequest} from '../types/AuthTypes';
 import { ApiEndpoints, KKey } from '../constants/ApiEndpoints';
 import { User } from '../types/User';
 
@@ -172,7 +172,6 @@ export const useLogin = () => {
     }
   };
 
-  // Login function
   const requestVerification = async (email: string): Promise<boolean> => {
     setLoading(true);
     setError(null);
@@ -203,12 +202,71 @@ export const useLogin = () => {
       setLoading(false);
     }
   };
+
+  const forgotPassword = async (email: string): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+  
+    try {
+      const request = { email };
+  
+      const response = await makeApiCall({
+        method: HttpMethod.POST,
+        url: ApiEndpoints.AUTH.FORGOT_PASSWORD,
+        data: request,
+        requiresHeader: false,
+      });
+  
+      // Assuming response is of type BaseResponse<LoginData>
+      console.log('Response:', response);
+  
+      return true;
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Sent code failed';
+      setError(errorMessage);
+  
+      // Clear all stored data on error
+      await AsyncStorage.clear();
+  
+      return false; // You don't need to throw if you're returning a boolean
+    } finally {
+      setLoading(false);
+    }
+  };
   
 
-  const resetPassword = async (email: string, verificationCode: string, password: string): Promise<string> => {
-    return '';
-  }
+  const resetPassword = async (email: string, password, code: string): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+  
+    try {
+      const request: ResetPasswordRequest = { email, password , code};
+  
+      const response = await makeApiCall({
+        method: HttpMethod.POST,
+        url: ApiEndpoints.AUTH.RESET_PASSWORD,
+        data: request,
+        requiresHeader: false,
+      });
+  
+      // Assuming response is of type BaseResponse<LoginData>
+      console.log('Response:', response);
+  
+      return true;
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Sent code failed';
+      setError(errorMessage);
+  
+      // Clear all stored data on error
+      await AsyncStorage.clear();
+  
+      return false; // You don't need to throw if you're returning a boolean
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   
 
-  return { loginUser, refreshAccessToken, signUpUser, requestVerification, resetPassword, loading, error, data };
+  return { loginUser, refreshAccessToken, signUpUser, requestVerification,forgotPassword, resetPassword, loading, error, data };
 };

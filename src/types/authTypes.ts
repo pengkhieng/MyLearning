@@ -6,6 +6,12 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface ResetPasswordRequest {
+  email: string;
+  password: string;
+  code: string;
+}
+
 export interface LoginData {
   user: User;
   refreshToken: string;

@@ -17,13 +17,11 @@ import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useLogin } from '../../hooks/useLogin';
 import { colors } from '../../utils/colors';
 import { globalStyles } from '../../style/globalStyles';
 import CustomButton from '../../components/CustomButton';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
-
-// Placeholder for a custom hook to handle password reset (replace with actual implementation)
-import { useLogin } from '../../hooks/useLogin';
 
 type ForgotPasswordNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ForgotPassword'>;
 
@@ -31,10 +29,11 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
-  const { resetPassword, loading, error, data } = useLogin();
+  const { forgotPassword, loading, error, data } = useLogin();
   const navigation = useNavigation<ForgotPasswordNavigationProp>();
 
-  const isDisable = email === '' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isButtonDisabled = !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || loading;
+
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -44,18 +43,25 @@ const ForgotPassword = () => {
   }, [fadeAnim]);
 
   const handleSendResetCode = async () => {
+    if (isButtonDisabled) {
+      Alert.alert('Invalid Email', 'Please enter a valid email address.');
+      return;
+    }
+
     try {
-      Alert.alert('Success', 'A password reset code has been sent to your email.');
-      navigation.push('VerifyCode');
-      // Optionally navigate to a screen to enter the reset code
+      const success = await forgotPassword(email);
+      if (success) {
+        Alert.alert('Success', 'A reset code has been sent to your email.');
+        navigation.navigate('ResetPassword', { email });
+      } else {
+        Alert.alert('Error', 'Failed to send verification code. Please try again.');
+      }
     } catch (err) {
       Alert.alert('Error', error || 'An error occurred while sending the reset code.');
     }
   };
 
-  const handleSignUp = () => {
-    Alert.alert('Sign Up', 'This feature is not yet implemented.');
-  };
+  const handleBackPress = () => navigation.goBack();
 
   return (
     <LinearGradient
@@ -64,7 +70,7 @@ const ForgotPassword = () => {
     >
       <SafeAreaView style={styles.safeArea}>
         <StatusBar barStyle="dark-content" />
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <KeyboardAvoidingView
@@ -78,6 +84,7 @@ const ForgotPassword = () => {
                 <Text style={styles.title}>Forgot Password? 🔒</Text>
                 <Text style={styles.subtitle}>Enter your email to receive a password reset code.</Text>
 
+                <Text style={styles.label}>Email</Text>
                 <View style={[globalStyles.inputContainer, isEmailFocused && globalStyles.inputFocused]}>
                   <TextInput
                     style={[globalStyles.input, isEmailFocused && { borderColor: colors.primary }]}
@@ -100,8 +107,8 @@ const ForgotPassword = () => {
                   onPress={handleSendResetCode}
                   animation="pulse"
                   duration={200}
-                  isDisabled={isDisable || loading}
-                  buttonStyle={{ marginBottom: 10 }}
+                  isDisabled={isButtonDisabled}
+                  buttonStyle={styles.button}
                 />
               </Animated.View>
             </View>
@@ -139,6 +146,11 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     textAlign: 'center',
   },
+  label: {
+    marginBottom: 10,
+    color: colors.text,
+    fontSize: 16,
+  },
   backButton: {
     position: 'absolute',
     left: 20,
@@ -149,17 +161,8 @@ const styles = StyleSheet.create({
     borderColor: 'white',
     zIndex: 1,
   },
-  signUp: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  signUpText: {
-    fontSize: 16,
-    color: colors.text,
-  },
-  signUpLink: {
-    color: colors.customDarkBlue,
-    fontWeight: '600',
+  button: {
+    marginBottom: 10,
   },
   error: {
     color: 'red',

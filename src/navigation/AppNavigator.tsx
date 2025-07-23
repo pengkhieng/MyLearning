@@ -15,6 +15,7 @@ import { KKey } from '../constants/ApiEndpoints';
 import ForgotPassword from '../screens/auth/ForgotPassword';
 import VerifyCode from '../screens/auth/VerifyCode';
 import UserModel from '../types/UserModel';
+import ResetPassword from '../screens/auth/ResetPassword';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -24,7 +25,8 @@ export type RootStackParamList = {
   Setting: undefined;
   SignUp: undefined;
   ForgotPassword: undefined;
-  VerifyCode: { user: UserModel };
+  VerifyCode: { user?: UserModel };
+  ResetPassword: { email: string };
   Detail: {
     title: string;
     data: Dashboard['summary'] | Dashboard['topProducts'] | Dashboard['dailySales'];
@@ -99,7 +101,8 @@ const AppNavigator = () => {
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ headerShown: false }} />
         <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Detail" component={DetailScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="VerifyCode" component={VerifyCode} options={{ headerShown: false }} />        
+        <Stack.Screen name="VerifyCode" component={VerifyCode} options={{ headerShown: false }} />  
+        <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: false }} />        
       </Stack.Navigator>
     </NavigationContainer>
   );

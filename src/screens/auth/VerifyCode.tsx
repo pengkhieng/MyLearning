@@ -14,36 +14,31 @@ import {
   Platform,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLogin } from '../../hooks/useLogin';
 import { colors } from '../../utils/colors';
 import { globalStyles } from '../../style/globalStyles';
 import CustomButton from '../../components/CustomButton';
-import { useRoute, RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
-// Placeholder for a custom hook to handle password reset (replace with actual implementation)
-import { useLogin } from '../../hooks/useLogin';
 import { KKey } from '../../constants/ApiEndpoints';
 
-type ForgotPasswordNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ForgotPassword'>;
+type VerifyCodeNavigationProp = NativeStackNavigationProp<RootStackParamList, 'VerifyCode'>;
+type VerifyCodeRouteProp = RouteProp<RootStackParamList, 'VerifyCode'>;
 
 const VerifyCode = () => {
   const [code, setCode] = useState('');
-  const [isEmailFocused, setIsCodeFocused] = useState(false);
+  const [isCodeFocused, setIsCodeFocused] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
   const { signUpUser, loading, error, data } = useLogin();
-  const navigation = useNavigation<ForgotPasswordNavigationProp>();
-
-  const route = useRoute<RouteProp<RootStackParamList, 'VerifyCode'>>();
+  const navigation = useNavigation<VerifyCodeNavigationProp>();
+  const route = useRoute<VerifyCodeRouteProp>();
   const { user } = route.params;
-  
 
+  const isButtonDisabled = !code || loading;
 
-  const isDisable = code === ""
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -52,34 +47,37 @@ const VerifyCode = () => {
     }).start();
   }, [fadeAnim]);
 
-  const handleSendResetCode = async () => {
-    try {
-      Alert.alert('Success', 'A password reset code has been sent to your email.');
-      // Optionally navigate to a screen to enter the reset code
-    } catch (err) {
-      Alert.alert('Error', error || 'An error occurred while sending the reset code.');
+  const handleVerifyCode = async () => {
+    if (!code) {
+      Alert.alert('Invalid Code', 'Please enter a verification code.');
+      return;
     }
-  };
-
-  const handleSignUp = async (verifyCode: string) => {
-   
-
-
 
     try {
-      const response = await  await signUpUser(user.username, user.email, user.password, verifyCode);
-      await AsyncStorage.setItem(KKey.ACCESS_TOKEN, response.data?.accessToken ?? '');
-      await AsyncStorage.setItem(KKey.REFRESH_TOKEN, response.data?.refreshToken ?? '');
+      const response = await signUpUser(
+        user?.username ?? '',
+        user?.email ?? '',
+        user?.password ?? '',
+        code
+      );
 
-      if (response.data?.user != null) {
+      if (response.data?.accessToken) {
+        await AsyncStorage.setItem(KKey.ACCESS_TOKEN, response.data.accessToken);
+      }
+      if (response.data?.refreshToken) {
+        await AsyncStorage.setItem(KKey.REFRESH_TOKEN, response.data.refreshToken);
+      }
+      if (response.data?.user) {
         await AsyncStorage.setItem(KKey.USER, JSON.stringify(response.data.user));
       }
+
       navigation.replace('Main');
     } catch (err) {
-      Alert.alert('Login Failed', error || 'An error occurred during login');
+      Alert.alert('Verification Failed', error || 'An error occurred during verification.');
     }
   };
-  
+
+  const handleBackPress = () => navigation.goBack();
 
   return (
     <LinearGradient
@@ -88,7 +86,7 @@ const VerifyCode = () => {
     >
       <SafeAreaView style={styles.safeArea}>
         <StatusBar barStyle="dark-content" />
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <KeyboardAvoidingView
@@ -99,12 +97,13 @@ const VerifyCode = () => {
           <ScrollView contentContainerStyle={globalStyles.scrollContainer} showsVerticalScrollIndicator={false}>
             <View style={styles.contentWrapper}>
               <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-                <Text style={styles.title}>Check your email</Text>
-                <Text style={styles.subtitle}>Enter your code that receive from your email.</Text>
-                <View style={[globalStyles.inputContainer, isEmailFocused && globalStyles.inputFocused]}>
+                <Text style={styles.title}>Verify Your Email</Text>
+                <Text style={styles.subtitle}>Enter the code sent to your email.</Text>
+                <Text style={styles.label}>Verification Code</Text>
+                <View style={[globalStyles.inputContainer, isCodeFocused && globalStyles.inputFocused]}>
                   <TextInput
-                    style={[globalStyles.input, isEmailFocused && { borderColor: colors.primary }]}
-                    placeholder="Enter your code"
+                    style={[globalStyles.input, isCodeFocused && { borderColor: colors.primary }]}
+                    placeholder="Enter code"
                     placeholderTextColor={colors.placeholderTxt}
                     value={code}
                     onChangeText={setCode}
@@ -119,12 +118,12 @@ const VerifyCode = () => {
                 {data && <Text style={styles.success}>{data.message}</Text>}
 
                 <CustomButton
-                  title={loading ? 'Verify Code...' : 'Verify Code'}
-                  onPress={() => handleSignUp(code)}
+                  title={loading ? 'Verifying...' : 'Verify Code'}
+                  onPress={handleVerifyCode}
                   animation="pulse"
                   duration={200}
-                  isDisabled={isDisable || loading}
-                  buttonStyle={{ marginBottom: 10 }}
+                  isDisabled={isButtonDisabled}
+                  buttonStyle={styles.button}
                 />
               </Animated.View>
             </View>
@@ -162,6 +161,11 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     textAlign: 'center',
   },
+  label: {
+    marginBottom: 10,
+    color: colors.text,
+    fontSize: 16,
+  },
   backButton: {
     position: 'absolute',
     left: 20,
@@ -172,17 +176,8 @@ const styles = StyleSheet.create({
     borderColor: 'white',
     zIndex: 1,
   },
-  signUp: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  signUpText: {
-    fontSize: 16,
-    color: colors.text,
-  },
-  signUpLink: {
-    color: colors.customDarkBlue,
-    fontWeight: '600',
+  button: {
+    marginBottom: 10,
   },
   error: {
     color: 'red',
