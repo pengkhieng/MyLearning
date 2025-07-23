@@ -22,16 +22,16 @@ const HomeScreen = () => {
   );
 
   const summaryItems = [
-    { label: 'Total Categories', value: summary[0]?.totalCategories || 0 , colors: colors.dashboard[0]},
-    { label: 'Total Items', value: summary[0]?.totalItems || 0 , colors: colors.dashboard[1]},
-    { label: 'Total Stock', value: summary[0]?.totalStock || 0 , colors: colors.dashboard[2]},
+    { label: 'Categories', value: summary[0]?.totalCategories || 0 , colors: colors.dashboard[0]},
+    { label: 'Items', value: summary[0]?.totalItems || 0 , colors: colors.dashboard[1]},
+    { label: 'In Stock', value: summary[0]?.totalStock || 0 , colors: colors.dashboard[2]},
     {
-      label: 'Inventory Value $',
+      label: 'Total Sell$',
       value: (summary[0]?.totalInventoryValue != null
         ? Number(summary[0].totalInventoryValue).toFixed(2)
         : '0.00'), colors: colors.dashboard[3]},  
     { label: 'Low Stock Items', value: summary[0]?.lowStockItems || 0 , colors: colors.dashboard[4]},
-    { label: 'Inactive Items', value: summary[0]?.inactiveItems || 0 , colors: colors.dashboard[5]},
+    { label: 'Disable Items', value: summary[0]?.inactiveItems || 0 , colors: colors.dashboard[5]},
   ];
 
     if (loading) {

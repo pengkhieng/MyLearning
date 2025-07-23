@@ -35,7 +35,7 @@ const OnboardingScreen = () => {
         if (currentScreen < onboardingData.length - 1) {
             setCurrentScreen(currentScreen + 1);
         } else {
-            navigation.replace('Login')
+            navigation.replace('Login',{})
         }
     };
 
@@ -46,7 +46,7 @@ const OnboardingScreen = () => {
     };
 
     const handleSkip = () => {
-        navigation.replace('Login')
+        navigation.replace('Login',{})
     };
 
     const handleDotPress = (index: number) => {

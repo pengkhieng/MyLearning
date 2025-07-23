@@ -18,7 +18,7 @@ import UserModel from '../types/UserModel';
 import ResetPassword from '../screens/auth/ResetPassword';
 
 export type RootStackParamList = {
-  Login: undefined;
+  Login: { user?: UserModel };
   Main: undefined;
   Welcome: undefined;
   Onboarding: undefined;

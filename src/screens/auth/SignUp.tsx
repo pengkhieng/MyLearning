@@ -77,7 +77,7 @@ const SignUp = () => {
   };
 
   const handleBackPress = () => navigation.goBack();
-  const handleLoginPress = () => navigation.replace('Login');
+  const handleLoginPress = () => navigation.replace('Login',{});
 
   return (
     <LinearGradient

@@ -14,7 +14,7 @@ import {
   Platform,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLogin } from '../../hooks/useLogin';
@@ -25,6 +25,8 @@ import type { RootStackParamList } from '../../navigation/AppNavigator';
 import { KKey } from '../../constants/ApiEndpoints';
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+type VerifyCodeRouteProp = RouteProp<RootStackParamList, 'Login'>;
+
 
 const LoginScreen = () => {
   const [username, setUsername] = useState('khieng');
@@ -36,6 +38,9 @@ const LoginScreen = () => {
   const { loginUser, loading, error, data } = useLogin();
   const navigation = useNavigation<LoginScreenNavigationProp>();
 
+    const route = useRoute<VerifyCodeRouteProp>();
+    const { user } = route.params;
+
   const isButtonDisabled = !username || !password || loading;
 
   useEffect(() => {
@@ -44,6 +49,10 @@ const LoginScreen = () => {
       duration: 1000,
       useNativeDriver: true,
     }).start();
+
+    setUsername( user?.username ?? "");
+    setPassword(user?.password ?? "");
+
   }, [fadeAnim]);
 
   const handleLogin = async () => {

@@ -31,7 +31,6 @@ const ResetPassword = () => {
   const [verifyCode, setVerifyCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [focusedField, setFocusedField] = useState('');
 
   const [isverifyCodeFocused, setIsVerifyCodeFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
@@ -65,7 +64,7 @@ const ResetPassword = () => {
 
     const success = await resetPassword(email, password, verifyCode);
     if (success) {
-      navigation.navigate('Login');
+      navigation.navigate('Login',{});
     } else {
       Alert.alert('Error', 'Failed to reset password. Please try again.');
     }
