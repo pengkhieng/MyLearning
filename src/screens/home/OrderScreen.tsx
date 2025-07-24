@@ -9,6 +9,13 @@ import { Picker } from '@react-native-picker/picker';
 import { colors } from '../../utils/colors'
 import { Order } from '../../types/Order';
 import { Product } from '../../types/Product';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../navigation/AppNavigator';
+import { useNavigation } from '@react-navigation/native';
+
+
+type OrderScreenScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'OrderScreen'>;
+
 
 const OrderScreen = () => {
   const { orders, loading, error, fetchOrders, addOrder, editOrder, deleteOrder } = useOrders();
@@ -22,12 +29,14 @@ const OrderScreen = () => {
   const [isAddButtonVisible, setIsAddButtonVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
+  const navigation = useNavigation<OrderScreenScreenNavigationProp>();
+
 
   useFocusEffect(
     React.useCallback(() => {
       fetchOrders(true);
       fetchProducts(true); // Fetch products for item dropdown
-      return () => {};
+      return () => { };
     }, [fetchOrders, fetchProducts])
   );
 
@@ -116,6 +125,14 @@ const OrderScreen = () => {
     const updatedItems = [...items];
     updatedItems[index] = { ...updatedItems[index], [field]: value };
     setItems(updatedItems);
+  };
+
+  const handleOrderDetail = (order: Order) => {
+    if (!order || !order.id) {
+      Alert.alert('Error', 'Invalid order data');
+      return;
+    }
+    navigation.navigate('OrderDetailScreen', { data: order });
   };
 
   const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -256,42 +273,46 @@ const OrderScreen = () => {
               index % 2 === 0 ? styles.itemContainerEven : styles.itemContainerOdd,
             ]}
           >
-            <View style={styles.itemContent}>
-              <View style={styles.textContainer}>
-                <Text style={styles.itemTitle}>
-                  {order.name}
-                </Text>
-                <Text style={styles.itemDesc}>Address: {order.address}</Text>
-                <Text style={styles.itemDesc}>Phone: {order.phone}</Text>
-                <Text style={styles.itemDesc}>Status: {order.status}</Text>
-                <Text style={styles.itemDesc}>Items: {order.items.map(item => `${item.itemName} (x${item.quantity})`).join(', ')}</Text>
-                <Text style={[
-                  styles.itemDesc,
-                  order.customTotalPrice > 0 ? { textDecorationLine: 'line-through', color: 'red' } : {}
-                ]}>
-                  Total: ${order.totalAmount.toFixed(2)}
-                </Text>
-                {order.customTotalPrice > 0 && (
-                  <Text style={[styles.itemDesc, { color: 'green' }]}>
-                    Special Total Price: ${order.customTotalPrice.toFixed(2)}
+            <TouchableOpacity
+              style={styles.editIcon}
+              onPress={() => handleOrderDetail(order)}                >
+              <View style={styles.itemContent}>
+                <View style={styles.textContainer}>
+                  <Text style={styles.itemTitle}>
+                    {order.name}
                   </Text>
-                )}
+                  <Text style={styles.itemDesc}>Address: {order.address}</Text>
+                  <Text style={styles.itemDesc}>Phone: {order.phone}</Text>
+                  <Text style={styles.itemDesc}>Status: {order.status}</Text>
+                  <Text style={styles.itemDesc}>Items: {order.items.map(item => `${item.itemName} (x${item.quantity})`).join(', ')}</Text>
+                  <Text style={[
+                    styles.itemDesc,
+                    order.customTotalPrice > 0 ? { textDecorationLine: 'line-through', color: 'red' } : {}
+                  ]}>
+                    Total: ${order.totalAmount.toFixed(2)}
+                  </Text>
+                  {order.customTotalPrice > 0 && (
+                    <Text style={[styles.itemDesc, { color: 'green' }]}>
+                      Special Total Price: ${order.customTotalPrice.toFixed(2)}
+                    </Text>
+                  )}
+                </View>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    style={styles.editIcon}
+                    onPress={() => handleEditOrder(order)}
+                  >
+                    <Ionicons name="pencil" size={24} color="#007AFF" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.deleteIcon}
+                    onPress={() => handleDeleteOrder(order.id, order.name)}
+                  >
+                    <Ionicons name="trash" size={24} color="#FF3B30" />
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={styles.editIcon}
-                  onPress={() => handleEditOrder(order)}
-                >
-                  <Ionicons name="pencil" size={24} color="#007AFF" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.deleteIcon}
-                  onPress={() => handleDeleteOrder(order.id, order.name)}
-                >
-                  <Ionicons name="trash" size={24} color="#FF3B30" />
-                </TouchableOpacity>
-              </View>
-            </View>
+            </TouchableOpacity>
           </View>
         ))}
       </ScrollView>

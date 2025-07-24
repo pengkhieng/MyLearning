@@ -1,0 +1,252 @@
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  StatusBar,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
+import { globalStyles } from '../../style/globalStyles';
+import { useNavigation, RouteProp } from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { RootStackParamList } from '../../navigation/AppNavigator';
+import { colors } from '../../utils/colors'; // Adjust path as needed
+
+type OrderDetailScreenRouteProp = RouteProp<RootStackParamList, 'OrderDetailScreen'>;
+
+interface OrderDetailScreenProps {
+  route: OrderDetailScreenRouteProp;
+}
+
+const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({ route }) => {
+  const { data: Order } = route.params;
+  const navigation = useNavigation();
+
+  // Calculate subtotal from items
+  const subtotal = Order.items.reduce(
+    (sum, item) => sum + item.unitPrice * item.quantity,
+    0
+  );
+
+  return (
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={globalStyles.contentContainer}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="chevron-back" size={24} color="#000" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Order Receipt</Text>
+        </View>
+
+        {/* Receipt Container */}
+        <View style={styles.receiptContainer}>
+          {/* Store Info */}
+          <View style={styles.storeInfo}>
+            <Text style={styles.storeName}>FullFunc</Text>
+            <Text style={styles.storeDetail}>123 Business St, City, Country</Text>
+            <Text style={styles.storeDetail}>Phone: (555) 123-4567</Text>
+            <Text style={styles.storeDetail}>
+              Date: {new Date(Order.createdAt).toLocaleDateString()}
+            </Text>
+          </View>
+
+          {/* Divider */}
+          <View style={styles.divider}>
+            <Text style={styles.dividerText}>--------------------------------</Text>
+          </View>
+
+          {/* Customer Info */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Customer Information</Text>
+            <Text style={styles.infoText}>Name: {Order.name}</Text>
+            <Text style={styles.infoText}>Address: {Order.address}</Text>
+            <Text style={styles.infoText}>Phone: {Order.phone}</Text>
+            <Text style={styles.infoText}>Status: {Order.status}</Text>
+          </View>
+
+          {/* Divider */}
+          <View style={styles.divider}>
+            <Text style={styles.dividerText}>--------------------------------</Text>
+          </View>
+
+          {/* Items List */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Items</Text>
+            <View style={styles.itemHeader}>
+              <Text style={[styles.itemHeaderText, { flex: 2 }]}>Item</Text>
+              <Text style={[styles.itemHeaderText, { flex: 1, textAlign: 'center' }]}>
+                Qty
+              </Text>
+              <Text style={[styles.itemHeaderText, { flex: 1, textAlign: 'right' }]}>
+                Price
+              </Text>
+            </View>
+            {Order.items.map((item, index) => (
+              <View key={index} style={styles.itemRow}>
+                <Text style={[styles.itemText, { flex: 2 }]}>{item.itemName}</Text>
+                <Text style={[styles.itemText, { flex: 1, textAlign: 'center' }]}>
+                  {item.quantity}
+                </Text>
+                <Text style={[styles.itemText, { flex: 1, textAlign: 'right' }]}>
+                  ${(item.unitPrice * item.quantity).toFixed(2)}
+                </Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Divider */}
+          <View style={styles.divider}>
+            <Text style={styles.dividerText}>--------------------------------</Text>
+          </View>
+
+          {/* Totals Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Summary</Text>
+            {Order.customTotalPrice > 0 && (
+              <View style={styles.totalRow}>
+                <Text style={[styles.totalLabel, { color: '#FF3B30' }]}>
+                  Original Total:
+                </Text>
+                <Text style={[styles.totalValue, { color: '#FF3B30', textDecorationLine: 'line-through' }]}>
+                  ${Order.totalAmount.toFixed(2)}
+                </Text>
+              </View>
+            )}
+            <View style={styles.totalRow}>
+              <Text style={[styles.totalLabel, styles.finalTotalLabel]}>
+                Total:
+              </Text>
+              <Text style={[styles.totalValue, styles.finalTotalValue]}>
+                ${(Order.customTotalPrice > 0 ? Order.customTotalPrice : Order.totalAmount).toFixed(2)}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+    </View>
+  );
+};
+
+export default OrderDetailScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  backButton: {
+    marginRight: 10,
+    padding: 4,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+  },
+  receiptContainer: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  storeInfo: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  storeName: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#000',
+    marginBottom: 4,
+  },
+  storeDetail: {
+    fontSize: 14,
+    color: '#555',
+    marginBottom: 2,
+  },
+  divider: {
+    marginVertical: 12,
+    alignItems: 'center',
+  },
+  dividerText: {
+    fontSize: 14,
+    color: '#999',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace', // Receipt-like font
+  },
+  section: {
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#000',
+    marginBottom: 8,
+  },
+  infoText: {
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 4,
+  },
+  itemHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  itemHeaderText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#555',
+  },
+  itemRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  itemText: {
+    fontSize: 14,
+    color: '#333',
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  totalLabel: {
+    fontSize: 14,
+    color: '#333',
+  },
+  totalValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+  },
+  finalTotalLabel: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#000',
+  },
+  finalTotalValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: 'green',
+  },
+});

@@ -16,6 +16,9 @@ import ForgotPassword from '../screens/auth/ForgotPassword';
 import VerifyCode from '../screens/auth/VerifyCode';
 import UserModel from '../types/UserModel';
 import ResetPassword from '../screens/auth/ResetPassword';
+import { Order } from '../types/Order';
+import OrderDetailScreen from '../screens/home/OrderDetailScreen';
+import OrderScreen from '../screens/home/OrderScreen';
 
 export type RootStackParamList = {
   Login: { user?: UserModel };
@@ -32,6 +35,8 @@ export type RootStackParamList = {
     data: Dashboard['summary'] | Dashboard['topProducts'] | Dashboard['dailySales'];
     color: string;
   };
+  OrderScreen: undefined;
+  OrderDetailScreen: {data: Order};
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -102,7 +107,9 @@ const AppNavigator = () => {
         <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Detail" component={DetailScreen} options={{ headerShown: false }} />
         <Stack.Screen name="VerifyCode" component={VerifyCode} options={{ headerShown: false }} />  
-        <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: false }} />        
+        <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: false }} />   
+        <Stack.Screen name="OrderDetailScreen" component={OrderDetailScreen} options={{ headerShown: false }} />        
+        <Stack.Screen name="OrderScreen" component={OrderScreen} options={{ headerShown: false }} />        
       </Stack.Navigator>
     </NavigationContainer>
   );
