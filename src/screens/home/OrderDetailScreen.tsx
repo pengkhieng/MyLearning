@@ -7,12 +7,12 @@ import {
   StatusBar,
   TouchableOpacity,
   Platform,
+  Alert,
 } from 'react-native';
-import { globalStyles } from '../../style/globalStyles';
 import { useNavigation, RouteProp } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import { colors } from '../../utils/colors'; // Adjust path as needed
+import { formatToCambodiaTime12h } from '../../utils/helpers';
 
 type OrderDetailScreenRouteProp = RouteProp<RootStackParamList, 'OrderDetailScreen'>;
 
@@ -33,16 +33,21 @@ const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({ route }) => {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="chevron-back" size={24} color="#000" />
+        </TouchableOpacity>
+
+        <Text style={styles.title}>Order Receipt</Text>
+        <TouchableOpacity onPress={() => Alert.alert('This feature is not implemented yet.')}>
+          <Text style={styles.buttonPrint}>Print</Text>
+        </TouchableOpacity>
+      </View>
+
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={globalStyles.contentContainer}
+        contentContainerStyle={styles.contentContainerScroller}
       >
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Ionicons name="chevron-back" size={24} color="#000" />
-          </TouchableOpacity>
-          <Text style={styles.title}>Order Receipt</Text>
-        </View>
 
         {/* Receipt Container */}
         <View style={styles.receiptContainer}>
@@ -52,13 +57,13 @@ const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({ route }) => {
             <Text style={styles.storeDetail}>123 Business St, City, Country</Text>
             <Text style={styles.storeDetail}>Phone: (555) 123-4567</Text>
             <Text style={styles.storeDetail}>
-              Date: {new Date(Order.createdAt).toLocaleDateString()}
+              Date:  {formatToCambodiaTime12h(Order.createdAt)}
             </Text>
           </View>
 
           {/* Divider */}
           <View style={styles.divider}>
-            <Text style={styles.dividerText}>--------------------------------</Text>
+            <Text numberOfLines={1} style={styles.dividerText}>---------------------------------------</Text>
           </View>
 
           {/* Customer Info */}
@@ -72,7 +77,7 @@ const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({ route }) => {
 
           {/* Divider */}
           <View style={styles.divider}>
-            <Text style={styles.dividerText}>--------------------------------</Text>
+            <Text numberOfLines={1} style={styles.dividerText}>---------------------------------------</Text>
           </View>
 
           {/* Items List */}
@@ -83,8 +88,11 @@ const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({ route }) => {
               <Text style={[styles.itemHeaderText, { flex: 1, textAlign: 'center' }]}>
                 Qty
               </Text>
-              <Text style={[styles.itemHeaderText, { flex: 1, textAlign: 'right' }]}>
+              <Text style={[styles.itemHeaderText, { flex: 1, textAlign: 'center' }]}>
                 Price
+              </Text>
+              <Text style={[styles.itemHeaderText, { flex: 1, textAlign: 'right' }]}>
+                Total
               </Text>
             </View>
             {Order.items.map((item, index) => (
@@ -92,6 +100,9 @@ const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({ route }) => {
                 <Text style={[styles.itemText, { flex: 2 }]}>{item.itemName}</Text>
                 <Text style={[styles.itemText, { flex: 1, textAlign: 'center' }]}>
                   {item.quantity}
+                </Text>
+                <Text style={[styles.itemText, { flex: 1, textAlign: 'center' }]}>
+                  ${(item.unitPrice).toFixed(2)}
                 </Text>
                 <Text style={[styles.itemText, { flex: 1, textAlign: 'right' }]}>
                   ${(item.unitPrice * item.quantity).toFixed(2)}
@@ -102,7 +113,7 @@ const OrderDetailScreen: React.FC<OrderDetailScreenProps> = ({ route }) => {
 
           {/* Divider */}
           <View style={styles.divider}>
-            <Text style={styles.dividerText}>--------------------------------</Text>
+            <Text numberOfLines={1} style={styles.dividerText}>---------------------------------------</Text>
           </View>
 
           {/* Totals Section */}
@@ -142,19 +153,37 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    paddingBottom: 0,
+    paddingHorizontal: 20,
+    justifyContent: 'space-between',
   },
   backButton: {
-    marginRight: 10,
-    padding: 4,
+    padding: 10,
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: 'white',
+    zIndex: 1,
   },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
+    flex: 1,
+    textAlign: 'center',
+  },
+  buttonPrint: {
+    fontSize: 16,
+    color: 'green',
+    textAlign: 'right',
+    fontWeight:'bold',
+    
+  },
+  contentContainerScroller: {
+    marginTop: 20,
+    paddingHorizontal: 16,
+    flexGrow: 1,
   },
   receiptContainer: {
-    marginHorizontal: 16,
-    marginTop: 16,
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
@@ -186,7 +215,7 @@ const styles = StyleSheet.create({
   dividerText: {
     fontSize: 14,
     color: '#999',
-    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace', // Receipt-like font
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   section: {
     marginBottom: 16,
