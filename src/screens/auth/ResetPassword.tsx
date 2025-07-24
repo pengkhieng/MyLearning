@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useLogin } from '../../hooks/useLogin';
 import { colors } from '../../utils/colors';
@@ -26,43 +26,46 @@ import type { RootStackParamList } from '../../navigation/AppNavigator';
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 type VerifyCodeRouteProp = RouteProp<RootStackParamList, 'ResetPassword'>;
 
-
 const ResetPassword = () => {
-  const [verifyCode, setVerifyCode] = useState('');
+  // State for form inputs
+  const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const [isverifyCodeFocused, setIsVerifyCodeFocused] = useState(false);
+  // State for input focus
+  const [isCodeFocused, setIsCodeFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-  const [isNewPasswordFocused, setIsNewPasswordFocused] = useState(false);
+  const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] = useState(false);
 
+  // Animation and navigation
   const fadeAnim = useState(new Animated.Value(0))[0];
   const { resetPassword, loading, error, data } = useLogin();
   const navigation = useNavigation<NavigationProp>();
-  const route = useRoute<RouteProp<RootStackParamList, 'ResetPassword'>>();
+  const route = useRoute<VerifyCodeRouteProp>();
   const { email } = route.params;
 
-
+  // Fade-in animation on mount
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 1000,
       useNativeDriver: true,
     }).start();
-  }, []);
+  }, [fadeAnim]);
 
+  // Handle password reset submission
   const handleResetPassword = async () => {
-    if (!verifyCode || password.length < 8 || confirmPassword.length < 8) {
-      Alert.alert('Error', 'All fields must be filled and passwords must be at least 8 characters.');
+    if (!code || password.length < 8 || confirmPassword.length < 8) {
+      Alert.alert('Error', 'All fields are required and passwords must be at least 8 characters.');
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Password Mismatch', 'New password and confirmation do not match.');
+      Alert.alert('Error', 'Passwords do not match.');
       return;
     }
 
-    const success = await resetPassword(email, password, verifyCode);
+    const success = await resetPassword(email, password, code);
     if (success) {
       navigation.navigate('Login',{});
     } else {
@@ -77,7 +80,7 @@ const ResetPassword = () => {
     >
       <SafeAreaView style={styles.safeArea}>
         <StatusBar barStyle="dark-content" />
-        <TouchableOpacity onPress={navigation.goBack} style={styles.backButton}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </TouchableOpacity>
 
@@ -88,31 +91,31 @@ const ResetPassword = () => {
         >
           <ScrollView contentContainerStyle={globalStyles.scrollContainer} showsVerticalScrollIndicator={false}>
             <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-              <Text style={styles.title}>Reset Password! 👋</Text>
-              <Text style={styles.subtitle}>Please enter the verification code and your new password.</Text>
+              <Text style={styles.title}>Reset Password</Text>
+              <Text style={styles.subtitle}>Enter the verification code and your new password.</Text>
 
-              {/* Verification Code */}
+              {/* Verification Code Input */}
               <Text style={styles.label}>Verification Code</Text>
-              <View style={[globalStyles.inputContainer, isverifyCodeFocused && globalStyles.inputFocused]}>
+              <View style={[globalStyles.inputContainer, isCodeFocused && globalStyles.inputFocused]}>
                 <TextInput
-                  style={[globalStyles.input, isverifyCodeFocused && { borderColor: colors.primary }]}
+                  style={[globalStyles.input, isCodeFocused && { borderColor: colors.primary }]}
                   placeholder="Verification Code"
                   placeholderTextColor={colors.placeholderTxt}
-                  value={verifyCode}
-                  onChangeText={setVerifyCode}
+                  value={code}
+                  onChangeText={setCode}
                   keyboardType="default"
                   autoCapitalize="none"
-                  onFocus={() => setIsVerifyCodeFocused(true)}
-                  onBlur={() => setIsVerifyCodeFocused(false)}
+                  onFocus={() => setIsCodeFocused(true)}
+                  onBlur={() => setIsCodeFocused(false)}
                 />
               </View>
 
-              {/* New Password */}
+              {/* New Password Input */}
               <Text style={styles.label}>New Password</Text>
               <View style={[globalStyles.inputContainer, isPasswordFocused && globalStyles.inputFocused]}>
                 <TextInput
                   style={[globalStyles.input, isPasswordFocused && { borderColor: colors.primary }]}
-                  placeholder="Password"
+                  placeholder="New Password"
                   placeholderTextColor={colors.placeholderTxt}
                   value={password}
                   onChangeText={setPassword}
@@ -123,24 +126,25 @@ const ResetPassword = () => {
                 />
               </View>
 
-              {/* Confirm Password */}
+              {/* Confirm Password Input */}
               <Text style={styles.label}>Confirm Password</Text>
-              <View style={[globalStyles.inputContainer, isNewPasswordFocused && globalStyles.inputFocused]}>
+              <View style={[globalStyles.inputContainer, isConfirmPasswordFocused && globalStyles.inputFocused]}>
                 <TextInput
-                  style={[globalStyles.input, isNewPasswordFocused && { borderColor: colors.primary }]}
+                  style={[globalStyles.input, isConfirmPasswordFocused && { borderColor: colors.primary }]}
                   placeholder="Confirm Password"
                   placeholderTextColor={colors.placeholderTxt}
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   secureTextEntry
-                  onFocus={() => setIsNewPasswordFocused(true)}
-                  onBlur={() => setIsNewPasswordFocused(false)}
+                  autoCapitalize="none"
+                  onFocus={() => setIsConfirmPasswordFocused(true)}
+                  onBlur={() => setIsConfirmPasswordFocused(false)}
                 />
               </View>
 
               {/* Error or Success Message */}
               {error && <Text style={styles.error}>{error}</Text>}
-              {data && <Text style={styles.success}>{data.message}</Text>}
+              {data?.message && <Text style={styles.success}>{data.message}</Text>}
 
               {/* Submit Button */}
               <CustomButton
@@ -148,7 +152,7 @@ const ResetPassword = () => {
                 onPress={handleResetPassword}
                 animation="pulse"
                 duration={200}
-                isDisabled={!verifyCode || !password || !confirmPassword || loading}
+                isDisabled={!code || !password || !confirmPassword || loading}
                 buttonStyle={styles.button}
               />
             </Animated.View>
@@ -160,12 +164,16 @@ const ResetPassword = () => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  keyboardAvoidingContainer: { flex: 1 },
+  safeArea: {
+    flex: 1,
+  },
+  keyboardAvoidingContainer: {
+    flex: 1,
+  },
   content: {
-    paddingHorizontal: 30,
     flex: 1,
     justifyContent: 'center',
+    paddingHorizontal: 30,
   },
   title: {
     fontSize: 32,
@@ -181,9 +189,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   label: {
-    marginBottom: 10,
-    color: colors.text,
     fontSize: 16,
+    color: colors.text,
+    marginBottom: 10,
   },
   error: {
     color: 'red',
@@ -197,8 +205,8 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    left: 20,
     top: 60,
+    left: 20,
     padding: 10,
     borderRadius: 30,
     borderWidth: 2,

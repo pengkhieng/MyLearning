@@ -48,7 +48,7 @@ const VerifyCode = () => {
   }, [fadeAnim]);
 
   const resentCode = async () => {
-    resendVerification(user.email)
+    resendVerification(user?.email ?? "")
   }
 
   const handleVerifyCode = async () => {
