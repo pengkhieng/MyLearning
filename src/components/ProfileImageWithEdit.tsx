@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Image, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, Platform } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { launchImageLibrary } from 'react-native-image-picker';
-import { User } from "../types/AuthTypes";
-import { colors, Colors } from '../utils/colors';
+import { colors } from '../utils/colors';
+import { User } from '../types/User'
 
 interface ProfileImageProps {
   user: User | null;

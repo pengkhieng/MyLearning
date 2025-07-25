@@ -8,8 +8,16 @@ import { Category } from '../../types/CategoryType';
 import { globalStyles } from '../../style/globalStyles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Picker } from '@react-native-picker/picker';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+
+
 
 import { colors } from '../../utils/colors'
+import { RootStackParamList } from '../../navigation/AppNavigator';
+
+type ProductScreenScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'OrderScreen'>;
+
 
 const ProductScreen = () => {
   const { products, loading, error, fetchProducts, addProduct, editProduct, deleteProduct } = useProducts();
@@ -23,12 +31,14 @@ const ProductScreen = () => {
   const [isAddButtonVisible, setIsAddButtonVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const navigation = useNavigation<ProductScreenScreenNavigationProp>();
+
 
   useFocusEffect(
     React.useCallback(() => {
       fetchProducts(true);
       fetchCategories(true); // Fetch categories to populate dropdown
-      return () => {};
+      return () => { };
     }, [fetchProducts, fetchCategories])
   );
 
@@ -110,6 +120,14 @@ const ProductScreen = () => {
     );
   };
 
+  const handleProductDetail = (product: Product) => {
+    if (!product || !product.itemId) {
+      Alert.alert('Error', 'Invalid product data');
+      return;
+    }
+    navigation.navigate('ProductDetailScreen', { data: product });
+  }
+
   const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const currentScrollY = event.nativeEvent.contentOffset.y;
     if (currentScrollY <= 10) {
@@ -132,6 +150,12 @@ const ProductScreen = () => {
     return (
       <View style={[globalStyles.contentContainer, styles.centered]}>
         <Text style={styles.errorText}>Error: {error}</Text>
+        <TouchableOpacity style={{ alignItems: 'center', marginTop: 60, backgroundColor: 'red', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10 }} onPress={() => {
+          fetchProducts(true);
+          fetchCategories(true);
+        }}>
+          <Text style={{ color: 'white', fontWeight: 'bold' }}>Try Again</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -219,42 +243,46 @@ const ProductScreen = () => {
         onScroll={handleScroll}
         scrollEventThrottle={16}
       >
-        {products.map((item, index) => (
-          <View
-            key={item.itemId}
-            style={[
-              styles.itemContainer,
-              index % 2 === 0 ? styles.itemContainerEven : styles.itemContainerOdd,
-            ]}
+        {products.map((item) => (
+          <TouchableOpacity
+            key={item.itemId} // Move the key here
+            onPress={() => handleProductDetail(item)}
           >
-            <View style={styles.itemContent}>
-              <View style={styles.textContainer}>
-                <Text style={styles.itemTitle}>{item.name}</Text>
-                <Text style={styles.itemDesc} numberOfLines={1} ellipsizeMode="tail">
-                  {item.description}
-                </Text>
-                <Text style={styles.itemDesc}>Price: ${item.price}</Text>
-                <Text style={styles.itemDesc}>Stock: {item.stock}</Text>
-                <Text style={styles.itemDesc}>
-                  Category: {categories.find((cat) => cat.id === item.categoryId)?.name || item.categoryId}
-                </Text>
-              </View>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={styles.editIcon}
-                  onPress={() => handleEditProduct(item)}
-                >
-                  <Ionicons name="pencil" size={24} color="#007AFF" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.deleteIcon}
-                  onPress={() => handleDeleteProduct(item.itemId, item.name)}
-                >
-                  <Ionicons name="trash" size={24} color="#FF3B30" />
-                </TouchableOpacity>
+            <View
+              style={[
+                styles.itemContainer,
+                products.indexOf(item) % 2 === 0 ? styles.itemContainerEven : styles.itemContainerOdd,
+              ]}
+            >
+              <View style={styles.itemContent}>
+                <View style={styles.textContainer}>
+                  <Text style={styles.itemTitle}>{item.name}</Text>
+                  <Text style={styles.itemDesc} numberOfLines={1} ellipsizeMode="tail">
+                    {item.description}
+                  </Text>
+                  <Text style={styles.itemDesc}>Price: ${item.price}</Text>
+                  <Text style={styles.itemDesc}>Stock: {item.stock}</Text>
+                  <Text style={styles.itemDesc}>
+                    Category: {categories.find((cat) => cat.id === item.categoryId)?.name || item.categoryId}
+                  </Text>
+                </View>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    style={styles.editIcon}
+                    onPress={() => handleEditProduct(item)}
+                  >
+                    <Ionicons name="pencil" size={24} color="#007AFF" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.deleteIcon}
+                    onPress={() => handleDeleteProduct(item.itemId, item.name)}
+                  >
+                    <Ionicons name="trash" size={24} color="#FF3B30" />
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
       {isAddButtonVisible && (

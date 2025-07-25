@@ -51,8 +51,8 @@ const CustomButton: React.FC<CustomButtonProps> = ({
               gradientColors
                 ? gradientColors
                 : isDisabled
-                ? [colors.button.disabledStart, colors.button.disabledEnd]
-                : [colors.button.start, colors.button.end]
+                  ? [colors.button.disabledStart, colors.button.disabledEnd]
+                  : [colors.button.start, colors.button.end]
             }
             style={[globalStyles.buttonGradient, gradientStyle]}
           >

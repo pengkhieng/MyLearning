@@ -1,21 +1,31 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, Platform, Dimensions, Alert, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  Platform,
+  Dimensions,
+  Alert,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useOrders } from '../../hooks/useOrders';
 import { useProducts } from '../../hooks/useProduct';
 import { globalStyles } from '../../style/globalStyles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Picker } from '@react-native-picker/picker';
-import { colors } from '../../utils/colors'
+import { colors } from '../../utils/colors';
 import { Order } from '../../types/Order';
 import { Product } from '../../types/Product';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import { useNavigation } from '@react-navigation/native';
 
-
-type OrderScreenScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'OrderScreen'>;
-
+type OrderScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'OrderScreen'>;
 
 const OrderScreen = () => {
   const { orders, loading, error, fetchOrders, addOrder, editOrder, deleteOrder } = useOrders();
@@ -29,13 +39,12 @@ const OrderScreen = () => {
   const [isAddButtonVisible, setIsAddButtonVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
-  const navigation = useNavigation<OrderScreenScreenNavigationProp>();
-
+  const navigation = useNavigation<OrderScreenNavigationProp>();
 
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       fetchOrders(true);
-      fetchProducts(true); // Fetch products for item dropdown
+      fetchProducts(true);
       return () => { };
     }, [fetchOrders, fetchProducts])
   );
@@ -157,6 +166,12 @@ const OrderScreen = () => {
     return (
       <View style={[globalStyles.contentContainer, styles.centered]}>
         <Text style={styles.errorText}>Error: {error}</Text>
+        <TouchableOpacity
+          style={{ alignItems: 'center', marginTop: 60, backgroundColor: 'red', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10 }}
+          onPress={() => fetchOrders(true)}
+        >
+          <Text style={{ color: 'white', fontWeight: 'bold' }}>Try Again</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -273,22 +288,22 @@ const OrderScreen = () => {
               index % 2 === 0 ? styles.itemContainerEven : styles.itemContainerOdd,
             ]}
           >
-            <TouchableOpacity
-              style={styles.editIcon}
-              onPress={() => handleOrderDetail(order)}                >
+            <TouchableOpacity onPress={() => handleOrderDetail(order)}>
               <View style={styles.itemContent}>
                 <View style={styles.textContainer}>
-                  <Text style={styles.itemTitle}>
-                    {order.name}
-                  </Text>
+                  <Text style={styles.itemTitle}>{order.name}</Text>
                   <Text style={styles.itemDesc}>Address: {order.address}</Text>
                   <Text style={styles.itemDesc}>Phone: {order.phone}</Text>
                   <Text style={styles.itemDesc}>Status: {order.status}</Text>
-                  <Text style={styles.itemDesc}>Items: {order.items.map(item => `${item.itemName} (x${item.quantity})`).join(', ')}</Text>
-                  <Text style={[
-                    styles.itemDesc,
-                    order.customTotalPrice > 0 ? { textDecorationLine: 'line-through', color: 'red' } : {}
-                  ]}>
+                  <Text style={styles.itemDesc}>
+                    Items: {order.items.map(item => `${item.itemName} (x${item.quantity})`).join(', ')}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.itemDesc,
+                      order.customTotalPrice > 0 ? { textDecorationLine: 'line-through', color: 'red' } : {},
+                    ]}
+                  >
                     Total: ${order.totalAmount.toFixed(2)}
                   </Text>
                   {order.customTotalPrice > 0 && (
@@ -297,22 +312,16 @@ const OrderScreen = () => {
                     </Text>
                   )}
                 </View>
-                <View style={styles.buttonContainer}>
-                  <TouchableOpacity
-                    style={styles.editIcon}
-                    onPress={() => handleEditOrder(order)}
-                  >
-                    <Ionicons name="pencil" size={24} color="#007AFF" />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.deleteIcon}
-                    onPress={() => handleDeleteOrder(order.id, order.name)}
-                  >
-                    <Ionicons name="trash" size={24} color="#FF3B30" />
-                  </TouchableOpacity>
-                </View>
               </View>
             </TouchableOpacity>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.editIcon} onPress={() => handleEditOrder(order)}>
+                <Ionicons name="pencil" size={24} color="#007AFF" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.deleteIcon} onPress={() => handleDeleteOrder(order.id, order.name)}>
+                <Ionicons name="trash" size={24} color="#FF3B30" />
+              </TouchableOpacity>
+            </View>
           </View>
         ))}
       </ScrollView>
@@ -411,6 +420,7 @@ const OrderScreen = () => {
 
 export default OrderScreen;
 
+// Styles remain unchanged
 const styles = StyleSheet.create({
   container: {
     flex: 1,

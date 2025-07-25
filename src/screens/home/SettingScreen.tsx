@@ -9,7 +9,6 @@ import CustomButton from '../../components/CustomButton';
 import { useProfile } from '../../hooks/useProfile';
 import { globalStyles } from '../../style/globalStyles';
 import ProfileImageWithEdit from '../../components/ProfileImageWithEdit';
-import { KKey } from '../../constants/ApiEndpoints';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type SettingScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Setting'>;
@@ -25,10 +24,10 @@ const SettingScreen = () => {
 
   useEffect(() => {
     if (error) {
-      Alert.alert('Error', error, [{ text: 'OK', onPress: () => {} }]);
+      Alert.alert('Error', error, [{ text: 'OK', onPress: () => { } }]);
     }
   }, [error]);
-  
+
   const handleLogout = async () => {
     try {
       await AsyncStorage.clear();

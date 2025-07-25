@@ -19,6 +19,9 @@ import ResetPassword from '../screens/auth/ResetPassword';
 import { Order } from '../types/Order';
 import OrderDetailScreen from '../screens/home/OrderDetailScreen';
 import OrderScreen from '../screens/home/OrderScreen';
+import { Product } from '../types/Product';
+import ProductDetailScreen from '../screens/home/ProductDetailScreen';
+import ReceiptScreen from '../screens/home/ReceiptScreen';
 
 export type RootStackParamList = {
   Login: { user?: UserModel };
@@ -36,7 +39,9 @@ export type RootStackParamList = {
     color: string;
   };
   OrderScreen: undefined;
-  OrderDetailScreen: {data: Order};
+  OrderDetailScreen: { data: Order };
+  ReceiptScreen: { data: Order };
+  ProductDetailScreen: { data: Product }
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -106,10 +111,12 @@ const AppNavigator = () => {
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ headerShown: false }} />
         <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Detail" component={DetailScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="VerifyCode" component={VerifyCode} options={{ headerShown: false }} />  
-        <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: false }} />   
-        <Stack.Screen name="OrderDetailScreen" component={OrderDetailScreen} options={{ headerShown: false }} />        
-        <Stack.Screen name="OrderScreen" component={OrderScreen} options={{ headerShown: false }} />        
+        <Stack.Screen name="VerifyCode" component={VerifyCode} options={{ headerShown: false }} />
+        <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: false }} />
+        <Stack.Screen name="OrderDetailScreen" component={OrderDetailScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="ReceiptScreen" component={ReceiptScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="OrderScreen" component={OrderScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="ProductDetailScreen" component={ProductDetailScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

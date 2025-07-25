@@ -19,7 +19,7 @@ const CategoryScreen = () => {
   useFocusEffect(
     React.useCallback(() => {
       fetchCategories(true);
-      return () => {};
+      return () => { };
     }, [fetchCategories])
   );
 
@@ -98,6 +98,11 @@ const CategoryScreen = () => {
     return (
       <View style={[globalStyles.contentContainer, styles.centered]}>
         <Text style={styles.errorText}>Error: {error}</Text>
+        <TouchableOpacity style={{ alignItems: 'center', marginTop: 60, backgroundColor: 'red', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10 }} onPress={() => {
+          fetchCategories(true);
+        }}>
+          <Text style={{ color: 'white', fontWeight: 'bold' }}>Try Again</Text>
+        </TouchableOpacity>
       </View>
     );
   }

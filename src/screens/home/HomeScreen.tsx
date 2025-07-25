@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -17,38 +17,44 @@ const HomeScreen = () => {
   useFocusEffect(
     useCallback(() => {
       fetchSummary(true);
-      return () => {};
+      return () => { };
     }, [fetchSummary])
   );
 
   const summaryItems = [
-    { label: 'Categories', value: summary[0]?.totalCategories || 0 , colors: colors.dashboard[0]},
-    { label: 'Items', value: summary[0]?.totalItems || 0 , colors: colors.dashboard[1]},
-    { label: 'In Stock', value: summary[0]?.totalStock || 0 , colors: colors.dashboard[2]},
+    { label: 'Categories', value: summary[0]?.totalCategories || 0, colors: colors.dashboard[0] },
+    { label: 'Items', value: summary[0]?.totalItems || 0, colors: colors.dashboard[1] },
+    { label: 'In Stock', value: summary[0]?.totalStock || 0, colors: colors.dashboard[2] },
     {
       label: 'Total Sell$',
       value: (summary[0]?.totalInventoryValue != null
         ? Number(summary[0].totalInventoryValue).toFixed(2)
-        : '0.00'), colors: colors.dashboard[3]},  
-    { label: 'Low Stock Items', value: summary[0]?.lowStockItems || 0 , colors: colors.dashboard[4]},
-    { label: 'Disable Items', value: summary[0]?.inactiveItems || 0 , colors: colors.dashboard[5]},
+        : '0.00'), colors: colors.dashboard[3]
+    },
+    { label: 'Low Stock Items', value: summary[0]?.lowStockItems || 0, colors: colors.dashboard[4] },
+    { label: 'Disable Items', value: summary[0]?.inactiveItems || 0, colors: colors.dashboard[5] },
   ];
 
-    if (loading) {
-      return (
-        <View style={[globalStyles.contentContainer, styles.centered]}>
-          <Text style={styles.loadingText}>Loading...</Text>
-        </View>
-      );
-    }
-  
-    if (error) {
-      return (
-        <View style={[globalStyles.contentContainer, styles.centered]}>
-          <Text style={styles.errorText}>Error: {error}</Text>
-        </View>
-      );
-    }
+  if (loading) {
+    return (
+      <View style={[globalStyles.contentContainer, styles.centered]}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={[globalStyles.contentContainer, styles.centered]}>
+        <Text style={styles.errorText}>Error: {error}</Text>
+        <TouchableOpacity style={{ alignItems: 'center', marginTop: 60, backgroundColor: 'red', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10 }} onPress={() => {
+          fetchSummary(true);
+        }}>
+          <Text style={{ color: 'white', fontWeight: 'bold' }}>Try Again</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View>
