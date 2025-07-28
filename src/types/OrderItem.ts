@@ -3,4 +3,5 @@ export interface OrderItem {
     itemName: string;
     quantity: number;
     unitPrice: number;
+    imageUrl: string;
 }

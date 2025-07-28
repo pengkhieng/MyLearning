@@ -10,14 +10,11 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Picker } from '@react-native-picker/picker';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
-
-
-
-import { colors } from '../../utils/colors'
+import { colors } from '../../utils/colors';
 import { RootStackParamList } from '../../navigation/AppNavigator';
+import ProductCard from '../../components/ProductCard'; // Import the new component
 
 type ProductScreenScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'OrderScreen'>;
-
 
 const ProductScreen = () => {
   const { products, loading, error, fetchProducts, addProduct, editProduct, deleteProduct } = useProducts();
@@ -33,12 +30,11 @@ const ProductScreen = () => {
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const navigation = useNavigation<ProductScreenScreenNavigationProp>();
 
-
   useFocusEffect(
     React.useCallback(() => {
       fetchProducts(true);
-      fetchCategories(true); // Fetch categories to populate dropdown
-      return () => { };
+      fetchCategories(true);
+      return () => {};
     }, [fetchProducts, fetchCategories])
   );
 
@@ -47,7 +43,7 @@ const ProductScreen = () => {
     setName('');
     setDescription('');
     setPrice('');
-    setCategoryId(categories.length > 0 ? categories[0].id : ''); // Default to first category
+    setCategoryId(categories.length > 0 ? categories[0].id : '');
     setStock('');
     setModalVisible(true);
   };
@@ -126,7 +122,7 @@ const ProductScreen = () => {
       return;
     }
     navigation.navigate('ProductDetailScreen', { data: product });
-  }
+  };
 
   const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const currentScrollY = event.nativeEvent.contentOffset.y;
@@ -150,10 +146,13 @@ const ProductScreen = () => {
     return (
       <View style={[globalStyles.contentContainer, styles.centered]}>
         <Text style={styles.errorText}>Error: {error}</Text>
-        <TouchableOpacity style={{ alignItems: 'center', marginTop: 60, backgroundColor: 'red', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10 }} onPress={() => {
-          fetchProducts(true);
-          fetchCategories(true);
-        }}>
+        <TouchableOpacity
+          style={{ alignItems: 'center', marginTop: 60, backgroundColor: 'red', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10 }}
+          onPress={() => {
+            fetchProducts(true);
+            fetchCategories(true);
+          }}
+        >
           <Text style={{ color: 'white', fontWeight: 'bold' }}>Try Again</Text>
         </TouchableOpacity>
       </View>
@@ -239,51 +238,22 @@ const ProductScreen = () => {
       <ScrollView
         style={globalStyles.scrollView}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={globalStyles.contentContainer}
+        contentContainerStyle={[globalStyles.contentContainer, styles.scrollContent]}
         onScroll={handleScroll}
         scrollEventThrottle={16}
       >
-        {products.map((item) => (
-          <TouchableOpacity
-            key={item.itemId} // Move the key here
-            onPress={() => handleProductDetail(item)}
-          >
-            <View
-              style={[
-                styles.itemContainer,
-                products.indexOf(item) % 2 === 0 ? styles.itemContainerEven : styles.itemContainerOdd,
-              ]}
-            >
-              <View style={styles.itemContent}>
-                <View style={styles.textContainer}>
-                  <Text style={styles.itemTitle}>{item.name}</Text>
-                  <Text style={styles.itemDesc} numberOfLines={1} ellipsizeMode="tail">
-                    {item.description}
-                  </Text>
-                  <Text style={styles.itemDesc}>Price: ${item.price}</Text>
-                  <Text style={styles.itemDesc}>Stock: {item.stock}</Text>
-                  <Text style={styles.itemDesc}>
-                    Category: {categories.find((cat) => cat.id === item.categoryId)?.name || item.categoryId}
-                  </Text>
-                </View>
-                <View style={styles.buttonContainer}>
-                  <TouchableOpacity
-                    style={styles.editIcon}
-                    onPress={() => handleEditProduct(item)}
-                  >
-                    <Ionicons name="pencil" size={24} color="#007AFF" />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.deleteIcon}
-                    onPress={() => handleDeleteProduct(item.itemId, item.name)}
-                  >
-                    <Ionicons name="trash" size={24} color="#FF3B30" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          </TouchableOpacity>
-        ))}
+        <View style={styles.itemsContainer}>
+          {products.map((item) => (
+            <ProductCard
+              key={item.itemId}
+              product={item}
+              categories={categories}
+              onProductDetail={handleProductDetail}
+              onEditProduct={handleEditProduct}
+              onDeleteProduct={handleDeleteProduct}
+            />
+          ))}
+        </View>
       </ScrollView>
       {isAddButtonVisible && (
         <TouchableOpacity style={styles.addButton} onPress={handleAddProduct}>
@@ -357,47 +327,22 @@ const ProductScreen = () => {
   );
 };
 
-export default ProductScreen;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: 'relative',
   },
-  itemContainer: {
-    padding: 12,
-    borderRadius: 6,
-    marginBottom: 8,
-    alignSelf: 'stretch',
-    minHeight: 70,
-  },
-  itemContainerEven: {
-    backgroundColor: 'rgba(255, 145, 0, 0.1)', // Light orange
-  },
-  itemContainerOdd: {
-    backgroundColor: 'rgba(0, 128, 0, 0.1)', // Light green
-  },
-  itemContent: {
+  scrollContent: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    paddingHorizontal: 8,
   },
-  textContainer: {
-    flex: 1,
-  },
-  buttonContainer: {
+  itemsContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-  },
-  itemTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'black',
-  },
-  itemDesc: {
-    fontSize: 14,
-    color: '#555',
-    marginTop: 4,
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    width: '100%',
   },
   centered: {
     flex: 1,
@@ -500,12 +445,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  editIcon: {
-    padding: 8,
-  },
-  // delete below to avoid the cutoff:
-
-  deleteIcon: {
-    padding: 8,
-  },
 });
+
+export default ProductScreen;

@@ -1,25 +1,153 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, Platform, Dimensions, Alert, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  Platform,
+  Dimensions,
+  Alert,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import PropTypes from 'prop-types';
 import { useCategories } from '../../hooks/useCategories';
+import { useUploadImage } from '../../hooks/useUploadImage';
 import { globalStyles } from '../../style/globalStyles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import CategoryItem from '../../components/CategoryItem';
+import { colors } from '../../utils/colors';
 
-import { colors } from '../../utils/colors'
+interface Category {
+  id: string;
+  name: string;
+  description?: string;
+  imageUrl?: string;
+}
 
-const CategoryScreen = () => {
-  const { categories, loading, error, fetchCategories, addCategory, editCategory, deleteCategory } = useCategories();
+interface CategoryModalProps {
+  visible: boolean;
+  onCancel: () => void;
+  onSubmit: () => Promise<void>;
+  editingCategoryId: string | null;
+  name: string;
+  setName: (value: string) => void;
+  description: string;
+  setDescription: (value: string) => void;
+  imageUri: string | null;
+  onSelectImage: () => void;
+}
+
+const CategoryModal: React.FC<CategoryModalProps> = ({
+  visible,
+  onCancel,
+  onSubmit,
+  editingCategoryId,
+  name,
+  setName,
+  description,
+  setDescription,
+  imageUri,
+  onSelectImage,
+}) => (
+  <Modal
+    animationType="fade"
+    transparent
+    visible={visible}
+    onRequestClose={onCancel}
+  >
+    <View style={styles.modalOverlay}>
+      <View style={styles.modalContent}>
+        <Text style={styles.modalTitle}>
+          {editingCategoryId ? 'Edit Category' : 'Add New Category'}
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Category Name"
+          value={name}
+          onChangeText={setName}
+          autoFocus
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Category Description (optional)"
+          value={description}
+          onChangeText={setDescription}
+          multiline
+        />
+        <TouchableOpacity
+          style={[styles.modalButton, styles.imageButton]}
+          onPress={onSelectImage}
+        >
+          <Text style={styles.modalButtonText}>
+            {imageUri ? 'Change Image' : 'Choose Image (Optional)'}
+          </Text>
+        </TouchableOpacity>
+        {imageUri && <Text style={styles.imageSelectedText}>Image selected</Text>}
+
+        <View style={styles.modalButtonContainer}>
+          <TouchableOpacity
+            style={[styles.modalButton, styles.cancelButton]}
+            onPress={onCancel}
+          >
+            <Text style={styles.modalButtonText}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.modalButton, styles.addButtonModal]}
+            onPress={onSubmit}
+          >
+            <Text style={styles.modalButtonText}>
+              {editingCategoryId ? 'Update' : 'Add'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  </Modal>
+);
+
+CategoryModal.propTypes = {
+  visible: PropTypes.bool.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  editingCategoryId: PropTypes.string,
+  name: PropTypes.string.isRequired,
+  setName: PropTypes.func.isRequired,
+  description: PropTypes.string.isRequired,
+  setDescription: PropTypes.func.isRequired,
+  imageUri: PropTypes.string,
+  onSelectImage: PropTypes.func.isRequired,
+};
+
+const CategoryScreen: React.FC = () => {
+  const {
+    categories,
+    loading,
+    error,
+    fetchCategories,
+    addCategory,
+    editCategory,
+    deleteCategory,
+  } = useCategories();
+
+  const { uploadImage, loading: uploadLoading, error: uploadError } = useUploadImage();
+
   const [modalVisible, setModalVisible] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [imageUri, setImageUri] = useState<string | null>(null);
   const [isAddButtonVisible, setIsAddButtonVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
 
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       fetchCategories(true);
-      return () => { };
     }, [fetchCategories])
   );
 
@@ -27,35 +155,67 @@ const CategoryScreen = () => {
     setEditingCategoryId(null);
     setName('');
     setDescription('');
+    setImageUri(null);
     setModalVisible(true);
   };
 
-  const handleEditCategory = (category: { id: string; name: string; description?: string }) => {
+  const handleEditCategory = (category: Category) => {
     setEditingCategoryId(category.id);
     setName(category.name);
     setDescription(category.description || '');
+    setImageUri(category.imageUrl || null);
     setModalVisible(true);
   };
 
-  const handleSubmit = () => {
+  const handleSelectImage = () => {
+    launchImageLibrary({ mediaType: 'photo', quality: 1 }, (response) => {
+      if (response.didCancel) return;
+      if (response.errorCode) {
+        Alert.alert('Error', `Image picker error: ${response.errorMessage}`);
+      } else if (response.assets?.[0]?.uri) {
+        setImageUri(response.assets[0].uri);
+      }
+    });
+  };
+
+  const handleSubmit = async () => {
     if (!name.trim()) {
       Alert.alert('Error', 'Category name is required');
       return;
     }
-    if (editingCategoryId) {
-      editCategory(editingCategoryId, { name: name.trim(), description: description.trim() || '' });
-    } else {
-      addCategory({ name: name.trim(), description: description.trim() || '' });
+
+    try {
+      let imageUrl: string | undefined;
+      if (imageUri) {
+        const uploadedUrl = await uploadImage(imageUri);
+        if (!uploadedUrl) {
+          Alert.alert('Error', uploadError || 'Failed to upload image');
+          return;
+        }
+        imageUrl = uploadedUrl;
+      }
+
+      const categoryData = {
+        name: name.trim(),
+        description: description.trim(),
+      };
+
+      if (editingCategoryId) {
+        await editCategory(editingCategoryId, categoryData, imageUrl);
+      } else {
+        await addCategory(categoryData, imageUrl);
+      }
+
+      handleCancel();
+    } catch (err: any) {
+      Alert.alert('Error', err.message || 'Failed to save category');
     }
-    setName('');
-    setDescription('');
-    setEditingCategoryId(null);
-    setModalVisible(false);
   };
 
   const handleCancel = () => {
     setName('');
     setDescription('');
+    setImageUri(null);
     setEditingCategoryId(null);
     setModalVisible(false);
   };
@@ -71,235 +231,108 @@ const CategoryScreen = () => {
           style: 'destructive',
           onPress: () => deleteCategory(id),
         },
-      ],
-      { cancelable: true }
+      ]
     );
   };
 
-  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const currentScrollY = event.nativeEvent.contentOffset.y;
-    if (currentScrollY <= 10) {
-      setIsAddButtonVisible(true);
-    } else {
-      setIsAddButtonVisible(currentScrollY < lastScrollY);
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const currentScrollY = event.nativeEvent.contentOffset.y;
+      setIsAddButtonVisible(currentScrollY <= 10 || currentScrollY < lastScrollY);
+      setLastScrollY(currentScrollY);
+    },
+    [lastScrollY]
+  );
+
+  const renderContent = () => {
+    if (loading || uploadLoading) {
+      return (
+        <View style={[globalStyles.contentContainer, styles.centered]}>
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      );
     }
-    setLastScrollY(currentScrollY);
-  }, [lastScrollY]);
 
-  if (loading) {
-    return (
-      <View style={[globalStyles.contentContainer, styles.centered]}>
-        <Text style={styles.loadingText}>Loading...</Text>
-      </View>
-    );
-  }
+    if (error) {
+      return (
+        <View style={[globalStyles.contentContainer, styles.centered]}>
+          <Text style={styles.errorText}>Error: {error}</Text>
+          <TouchableOpacity
+            style={styles.tryAgainButton}
+            onPress={() => fetchCategories(true)}
+          >
+            <Text style={styles.tryAgainText}>Try Again</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
 
-  if (error) {
     return (
-      <View style={[globalStyles.contentContainer, styles.centered]}>
-        <Text style={styles.errorText}>Error: {error}</Text>
-        <TouchableOpacity style={{ alignItems: 'center', marginTop: 60, backgroundColor: 'red', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10 }} onPress={() => {
-          fetchCategories(true);
-        }}>
-          <Text style={{ color: 'white', fontWeight: 'bold' }}>Try Again</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  if (categories.length === 0) {
-    return (
-      <View style={[globalStyles.contentContainer, styles.centered]}>
-        <Text style={styles.noDataText}>No categories available</Text>
-        <TouchableOpacity style={styles.addButton} onPress={handleAddCategory}>
-          <Ionicons name="add" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={handleCancel}
+      <>
+        <ScrollView
+          style={globalStyles.scrollView}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={globalStyles.contentContainer}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
         >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{editingCategoryId ? 'Edit Category' : 'Add New Category'}</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Category Name"
-                value={name}
-                onChangeText={setName}
-                autoFocus={true}
+          {categories.length === 0 ? (
+            <Text style={styles.noDataText}>No categories available</Text>
+          ) : (
+            categories.map((item, index) => (
+              <CategoryItem
+                key={item.id}
+                item={item}
+                index={index}
+                onEdit={handleEditCategory}
+                onDelete={handleDeleteCategory}
               />
-              <TextInput
-                style={styles.input}
-                placeholder="Category Description (optional)"
-                value={description}
-                onChangeText={setDescription}
-                multiline
-              />
-              <View style={styles.modalButtonContainer}>
-                <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={handleCancel}>
-                  <Text style={styles.modalButtonText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.modalButton, styles.addButtonModal]} onPress={handleSubmit}>
-                  <Text style={styles.modalButtonText}>{editingCategoryId ? 'Save' : 'Add'}</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-      </View>
+            ))
+          )}
+        </ScrollView>
+        {isAddButtonVisible && (
+          <TouchableOpacity style={styles.addButton} onPress={handleAddCategory}>
+            <Ionicons name="add" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        )}
+      </>
     );
-  }
+  };
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        style={globalStyles.scrollView}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={globalStyles.contentContainer}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-      >
-        {categories.map((item, index) => (
-          <View
-            key={item.id}
-            style={[
-              styles.itemContainer,
-              {
-                backgroundColor: index % 2 !== 0 ? 'rgba(255, 145, 0, 0.1)' : 'rgba(0, 128, 0, 0.1)',
-              },
-            ]}
-          >
-            <View style={styles.itemContent}>
-              <View style={styles.textContainer}>
-                <Text style={styles.itemText}>{item.name?.trim() || 'Unnamed Category'}</Text>
-                {item.description ? (
-                  <Text style={styles.itemDescription} numberOfLines={1} ellipsizeMode="tail">
-                    {item.description}
-                  </Text>
-                ) : null}
-              </View>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={styles.editIcon}
-                  onPress={() => handleEditCategory(item)}
-                >
-                  <Ionicons name="pencil" size={24} color="#007AFF" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.deleteIcon}
-                  onPress={() => handleDeleteCategory(item.id, item.name)}
-                >
-                  <Ionicons name="trash" size={24} color="#FF3B30" />
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        ))}
-      </ScrollView>
-      {isAddButtonVisible && (
-        <TouchableOpacity style={styles.addButton} onPress={handleAddCategory}>
-          <Ionicons name="add" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-      )}
-      <Modal
-        animationType="fade"
-        transparent={true}
+      {renderContent()}
+      <CategoryModal
         visible={modalVisible}
-        onRequestClose={handleCancel}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{editingCategoryId ? 'Edit Category' : 'Add New Category'}</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Category Name"
-              value={name}
-              onChangeText={setName}
-              autoFocus={true}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Category Description (optional)"
-              value={description}
-              onChangeText={setDescription}
-              multiline
-            />
-            <View style={styles.modalButtonContainer}>
-              <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={handleCancel}>
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalButton, styles.addButtonModal]} onPress={handleSubmit}>
-                <Text style={styles.modalButtonText}>{editingCategoryId ? 'Update' : 'Add'}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+        onCancel={handleCancel}
+        onSubmit={handleSubmit}
+        editingCategoryId={editingCategoryId}
+        name={name}
+        setName={setName}
+        description={description}
+        setDescription={setDescription}
+        imageUri={imageUri}
+        onSelectImage={handleSelectImage}
+      />
     </View>
   );
 };
 
-export default CategoryScreen;
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    position: 'relative',
-  },
-  itemContainer: {
-    padding: 12,
-    borderRadius: 6,
-    marginBottom: 8,
-    alignSelf: 'stretch',
-    minHeight: 70,
-  },
-  itemContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  container: { flex: 1, position: 'relative' },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  loadingText: { fontSize: 16, color: 'gray' },
+  errorText: { fontSize: 16, color: 'red' },
+  noDataText: { fontSize: 16, color: 'gray' },
+  tryAgainButton: {
     alignItems: 'center',
+    marginTop: 60,
+    backgroundColor: 'red',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
   },
-  textContainer: {
-    flex: 1,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  itemText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'black',
-  },
-  itemDescription: {
-    fontSize: 14,
-    color: 'gray',
-    marginTop: 4,
-  },
-  editIcon: {
-    padding: 8,
-  },
-  deleteIcon: {
-    padding: 8,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: 16,
-    color: 'gray',
-  },
-  errorText: {
-    fontSize: 16,
-    color: 'red',
-  },
-  noDataText: {
-    fontSize: 16,
-    color: 'gray',
-  },
+  tryAgainText: { color: 'white', fontWeight: 'bold' },
   addButton: {
     position: 'absolute',
     bottom: Platform.OS === 'ios' ? 100 : 80,
@@ -321,11 +354,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
   },
@@ -336,11 +364,7 @@ const styles = StyleSheet.create({
     width: '80%',
     alignItems: 'center',
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 15,
-  },
+  modalTitle: { fontSize: 18, fontWeight: '600', marginBottom: 15 },
   input: {
     width: '100%',
     borderWidth: 1,
@@ -362,38 +386,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 5,
   },
-  cancelButton: {
-    backgroundColor: '#FF3B30',
-  },
-  addButtonModal: {
-    backgroundColor: '#007AFF',
+  cancelButton: { backgroundColor: '#FF3B30' },
+  addButtonModal: { backgroundColor: '#007AFF' },
+  imageButton: {
+    backgroundColor: colors.orangeWithOpacity,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 15,
+    width: '100%',
   },
   modalButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+    lineHeight: 20,
+    flexShrink: 1,
   },
-  editButton: {
-    backgroundColor: '#007AFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 80,
-    height: '100%',
-    borderRadius: 6,
-    marginBottom: 8,
-  },
-  deleteButton: {
-    backgroundColor: '#FF3B30',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 80,
-    height: '100%',
-    borderRadius: 6,
-    marginBottom: 8,
-  },
-  actionText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
+  imageSelectedText: {
+    fontSize: 14,
+    color: 'green',
+    marginBottom: 10,
   },
 });
+
+export default CategoryScreen;

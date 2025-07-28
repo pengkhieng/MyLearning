@@ -47,6 +47,7 @@ export class ApiEndpoints {
 
   static readonly PROFILE = {
     UPDATE: '/file/updateProfile',
+    UPLOAD: '/file/upload',
   };
 
   static readonly DASHBOARD = {

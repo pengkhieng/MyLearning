@@ -3,10 +3,19 @@ import { View, Text, Image, StyleSheet } from 'react-native';
 const ItemCard = ({ item }) => {
     return (
         <View style={styles.itemCard}>
-            <Image
-                style={styles.itemImage}
-                source={{ uri: 'https://reactnative.dev/img/tiny_logo.png' }}
-            />
+            {item.imageUrl && item.imageUrl.trim() !== "" ? (
+                <Image
+                    source={{ uri: item.imageUrl }}
+                    style={styles.itemImage}
+                    resizeMode="cover"
+                />
+            ) : (
+                <Image
+                    source={require('../assets/images/image_empty.png')}
+                    style={styles.itemImage}
+                    resizeMode="contain"
+                />
+            )}
             <View style={styles.itemInfo}>
                 <Text style={styles.itemName}>{item.itemName}</Text>
                 <Text style={styles.itemDetails}>Quantity: {item.quantity}</Text>

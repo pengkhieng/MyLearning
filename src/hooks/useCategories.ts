@@ -49,93 +49,129 @@ export const useCategories = () => {
     }
   }, []);
 
-  const addCategory = useCallback(async (category: { name: string; description?: string }) => {
-    setLoading(true);
-    setError(null);
+  const addCategory = useCallback(
+    async (
+      category: { name: string; description?: string },
+      imageUrl?: string
+    ) => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
-      if (!token) {
-        throw new Error('No access token found. Please log in.');
+      try {
+        const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
+        if (!token) {
+          throw new Error('No access token found. Please log in.');
+        }
+
+        console.log("LOG IMAGE URL: " + imageUrl);
+        console.log("LOG CATEGORY: " + JSON.stringify(category));
+
+        // Build URL with optional imageUrl query parameter
+        let url = ApiEndpoints.CATEGORY.CREATE;
+        if (imageUrl) {
+          // encodeURIComponent to safely include URL parameter
+          url += `?imageUrl=${encodeURIComponent(imageUrl)}`;
+        }
+
+        const response = await makeApiCall<Category>({
+          method: HttpMethod.POST,
+          url,
+          requiresHeader: true,
+          data: {
+            name: category.name,
+            description: category.description || '',
+            // imageUrl is removed from body, it's in the query param now
+          },
+        });
+
+        if (!response.data) {
+          throw new Error('Failed to create category: No data returned');
+        }
+
+        const newCategory: Category = response.data;
+        setCategories((prevCategories) => {
+          const updatedCategories = [...prevCategories, newCategory];
+          AsyncStorage.setItem(KKey.CATEGORY, JSON.stringify(updatedCategories)).catch((err) =>
+            console.error('Failed to update AsyncStorage:', err)
+          );
+          return updatedCategories;
+        });
+      } catch (err: any) {
+        const errorMessage =
+          err.status === 401
+            ? 'Unauthorized. Please log in again.'
+            : err.message || 'Failed to add category';
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
       }
+    },
+    []
+  );
 
-      const response = await makeApiCall<Category>({
-        method: HttpMethod.POST,
-        url: ApiEndpoints.CATEGORY.CREATE,
-        requiresHeader: true,
-        data: {
-          name: category.name,
-          description: category.description || '',
-        },
-      });
 
-      if (!response.data) {
-        throw new Error('Failed to create category: No data returned');
+  const editCategory = useCallback(
+    async (
+      id: string,
+      category: { name: string; description?: string },
+      imageUrl?: string
+    ) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
+        if (!token) {
+          throw new Error('No access token found. Please log in.');
+        }
+
+        let url = `${ApiEndpoints.CATEGORY.UPDATE}/${id}`;
+        if (imageUrl) {
+          const imageFileName = imageUrl.split('/').pop();
+          if (imageFileName) {
+            url += `?imageUrl=${encodeURIComponent(imageFileName)}`;
+          }
+        }
+
+
+        const response = await makeApiCall<Category>({
+          method: HttpMethod.PUT,
+          url,
+          requiresHeader: true,
+          data: {
+            name: category.name,
+            description: category.description || '',
+          },
+        });
+
+        if (!response.data) {
+          throw new Error('Failed to update category: No data returned');
+        }
+
+        const updatedCategory = response.data;
+
+        setCategories((prevCategories) => {
+          const updated = prevCategories.map((cat) =>
+            cat.id === id ? updatedCategory : cat
+          );
+          AsyncStorage.setItem(KKey.CATEGORY, JSON.stringify(updated)).catch((err) =>
+            console.error('Failed to update AsyncStorage:', err)
+          );
+          return updated;
+        });
+      } catch (err: any) {
+        const errorMessage =
+          err.status === 401
+            ? 'Unauthorized. Please log in again.'
+            : err.message || 'Failed to update category';
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
       }
+    },
+    []
+  );
 
-      const newCategory: Category = response.data;
-      setCategories((prevCategories) => {
-        const updatedCategories = [...prevCategories, newCategory];
-        AsyncStorage.setItem(KKey.CATEGORY, JSON.stringify(updatedCategories)).catch((err) =>
-          console.error('Failed to update AsyncStorage:', err)
-        );
-        return updatedCategories;
-      });
-    } catch (err: any) {
-      const errorMessage =
-        err.status === 401
-          ? 'Unauthorized. Please log in again.'
-          : err.message || 'Failed to add category';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const editCategory = useCallback(async (id: string, category: { name: string; description?: string }) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const token = await AsyncStorage.getItem(KKey.ACCESS_TOKEN);
-      if (!token) {
-        throw new Error('No access token found. Please log in.');
-      }
-
-      const response = await makeApiCall<Category>({
-        method: HttpMethod.PUT,
-        url: `${ApiEndpoints.CATEGORY.UPDATE}/${id}`,
-        requiresHeader: true,
-        data: {
-          name: category.name,
-          description: category.description || '',
-        },
-      });
-
-      if (!response.data) {
-        throw new Error('Failed to update category: No data returned');
-      }
-
-      const updatedCategory: Category = response.data;
-      setCategories((prevCategories) => {
-        const updatedCategories = prevCategories.map((cat) =>
-          cat.id === id ? updatedCategory : cat
-        );
-        AsyncStorage.setItem(KKey.CATEGORY, JSON.stringify(updatedCategories)).catch((err) =>
-          console.error('Failed to update AsyncStorage:', err)
-        );
-        return updatedCategories;
-      });
-    } catch (err: any) {
-      const errorMessage =
-        err.status === 401
-          ? 'Unauthorized. Please log in again.'
-          : err.message || 'Failed to update category';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   const deleteCategory = useCallback(async (id: string) => {
     setLoading(true);

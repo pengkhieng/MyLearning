@@ -54,10 +54,20 @@ const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({ route }) => {
         contentContainerStyle={styles.contentContainerScroller}
       >
         {/* Product Image */}
-        <Image
-          source={{ uri: 'https://reactnative.dev/img/tiny_logo.png' }}
-          style={styles.image}
-        />
+
+        {Product.imageUrl && Product.imageUrl.trim() !== "" ? (
+          <Image
+            source={{ uri: Product.imageUrl }}
+            style={styles.image}
+            resizeMode="cover"
+          />
+        ) : (
+          <Image
+            source={require('../../assets/images/image_empty.png')}
+            style={styles.image}
+            resizeMode="contain"
+          />
+        )}
 
         {/* Info Card */}
         <View style={styles.infoCard}>
