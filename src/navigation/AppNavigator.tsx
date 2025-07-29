@@ -7,7 +7,6 @@ import LoginScreen from '../screens/auth/LoginScreen';
 import MainScreen from '../screens/main/MainScreen';
 import WelcomeScreen from '../screens/onboarding/WelcomeScreen';
 import OnboardingScreen from '../screens/onboarding/OnboardingScreen';
-import DetailScreen from '../screens/home/DetailScreen';
 import { Dashboard } from '../models/home/dashboard';
 import { useLogin } from '../hooks/useLogin';
 import SignUp from '../screens/auth/SignUp';
@@ -17,11 +16,14 @@ import VerifyCode from '../screens/auth/VerifyCode';
 import UserModel from '../types/UserModel';
 import ResetPassword from '../screens/auth/ResetPassword';
 import { Order } from '../types/Order';
-import OrderDetailScreen from '../screens/home/OrderDetailScreen';
-import OrderScreen from '../screens/home/OrderScreen';
+import OrderDetailScreen from '../screens/order/OrderDetailScreen';
+import OrderScreen from '../screens/order/OrderScreen';
 import { Product } from '../types/Product';
-import ProductDetailScreen from '../screens/home/ProductDetailScreen';
-import ReceiptScreen from '../screens/home/ReceiptScreen';
+import ProductDetailScreen from '../screens/product/ProductDetailScreen';
+import ReceiptScreen from '../screens/order/ReceiptScreen';
+import { Category } from '../types/CategoryType';
+import CreateCategory from '../screens/category/CreateCategory';
+import CategoryScreen from '../screens/category/CategoryScreen';
 
 export type RootStackParamList = {
   Login: { user?: UserModel };
@@ -30,9 +32,17 @@ export type RootStackParamList = {
   Onboarding: undefined;
   Setting: undefined;
   SignUp: undefined;
+  CategoryScreen: undefined;
   ForgotPassword: undefined;
   VerifyCode: { user?: UserModel };
   ResetPassword: { email: string };
+  CreateCategory: {
+    data?: {
+      id: string,
+      category: { name: string; description?: string },
+      imageUrl?: string
+    }
+  };
   Detail: {
     title: string;
     data: Dashboard['summary'] | Dashboard['topProducts'] | Dashboard['dailySales'];
@@ -110,13 +120,14 @@ const AppNavigator = () => {
         <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ headerShown: false }} />
         <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="Detail" component={DetailScreen} options={{ headerShown: false }} />
         <Stack.Screen name="VerifyCode" component={VerifyCode} options={{ headerShown: false }} />
         <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: false }} />
         <Stack.Screen name="OrderDetailScreen" component={OrderDetailScreen} options={{ headerShown: false }} />
         <Stack.Screen name="ReceiptScreen" component={ReceiptScreen} options={{ headerShown: false }} />
         <Stack.Screen name="OrderScreen" component={OrderScreen} options={{ headerShown: false }} />
         <Stack.Screen name="ProductDetailScreen" component={ProductDetailScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="CategoryScreen" component={CategoryScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="CreateCategory" component={CreateCategory} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
