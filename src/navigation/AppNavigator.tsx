@@ -7,7 +7,6 @@ import LoginScreen from '../screens/auth/LoginScreen';
 import MainScreen from '../screens/main/MainScreen';
 import WelcomeScreen from '../screens/onboarding/WelcomeScreen';
 import OnboardingScreen from '../screens/onboarding/OnboardingScreen';
-import { Dashboard } from '../models/home/dashboard';
 import { useLogin } from '../hooks/useLogin';
 import SignUp from '../screens/auth/SignUp';
 import { KKey } from '../constants/ApiEndpoints';
@@ -21,9 +20,9 @@ import OrderScreen from '../screens/order/OrderScreen';
 import { Product } from '../types/Product';
 import ProductDetailScreen from '../screens/product/ProductDetailScreen';
 import ReceiptScreen from '../screens/order/ReceiptScreen';
-import { Category } from '../types/CategoryType';
 import CreateCategory from '../screens/category/CreateCategory';
 import CategoryScreen from '../screens/category/CategoryScreen';
+import CreateProduct from '../screens/product/CreateProduct';
 
 export type RootStackParamList = {
   Login: { user?: UserModel };
@@ -43,15 +42,15 @@ export type RootStackParamList = {
       imageUrl?: string
     }
   };
-  Detail: {
-    title: string;
-    data: Dashboard['summary'] | Dashboard['topProducts'] | Dashboard['dailySales'];
-    color: string;
-  };
   OrderScreen: undefined;
   OrderDetailScreen: { data: Order };
   ReceiptScreen: { data: Order };
   ProductDetailScreen: { data: Product }
+  ProductScreen: undefined;
+  CreateProduct: {
+    data?: { itemId: string; product: { name: string; description: string; price: number; categoryId: string; stock: number } },
+    imageUrl?: string
+  };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -128,6 +127,7 @@ const AppNavigator = () => {
         <Stack.Screen name="ProductDetailScreen" component={ProductDetailScreen} options={{ headerShown: false }} />
         <Stack.Screen name="CategoryScreen" component={CategoryScreen} options={{ headerShown: false }} />
         <Stack.Screen name="CreateCategory" component={CreateCategory} options={{ headerShown: false }} />
+        <Stack.Screen name="CreateProduct" component={CreateProduct} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

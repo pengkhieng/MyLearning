@@ -1,37 +1,38 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, Platform, Dimensions, Alert, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Platform,
+  Alert,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useProducts } from '../../hooks/useProduct';
-import { Product } from '../../types/Product';
 import { useCategories } from '../../hooks/useCategories';
-import { Category } from '../../types/CategoryType';
+import { Product } from '../../types/Product';
 import { globalStyles } from '../../style/globalStyles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { Picker } from '@react-native-picker/picker';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useNavigation } from '@react-navigation/native';
 import { colors } from '../../utils/colors';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import ProductCard from '../../components/ProductCard'; // Import the new component
+import ProductCard from '../../components/ProductCard';
 
-type ProductScreenScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'OrderScreen'>;
+type ProductScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ProductScreen'>;
 
-const ProductScreen = () => {
-  const { products, loading, error, fetchProducts, addProduct, editProduct, deleteProduct } = useProducts();
+const ProductScreen: React.FC = () => {
+  const { products, loading, error, fetchProducts, deleteProduct } = useProducts();
   const { categories, fetchCategories } = useCategories();
-  const [modalVisible, setModalVisible] = useState(false);
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  const [categoryId, setCategoryId] = useState('');
-  const [stock, setStock] = useState('');
   const [isAddButtonVisible, setIsAddButtonVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  const [editingProductId, setEditingProductId] = useState<string | null>(null);
-  const navigation = useNavigation<ProductScreenScreenNavigationProp>();
+
+  const navigation = useNavigation<ProductScreenNavigationProp>();
 
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       fetchProducts(true);
       fetchCategories(true);
       return () => {};
@@ -39,65 +40,22 @@ const ProductScreen = () => {
   );
 
   const handleAddProduct = () => {
-    setEditingProductId(null);
-    setName('');
-    setDescription('');
-    setPrice('');
-    setCategoryId(categories.length > 0 ? categories[0].id : '');
-    setStock('');
-    setModalVisible(true);
+    navigation.push('CreateProduct', {});
   };
 
   const handleEditProduct = (product: Product) => {
-    setEditingProductId(product.itemId);
-    setName(product.name);
-    setDescription(product.description);
-    setPrice(product.price.toString());
-    setCategoryId(product.categoryId);
-    setStock(product.stock.toString());
-    setModalVisible(true);
-  };
-
-  const handleSubmit = () => {
-    if (!name.trim() || !price.trim() || !categoryId.trim() || !stock.trim()) {
-      Alert.alert('Error', 'Name, price, category, and stock are required');
-      return;
-    }
-    const priceNum = parseFloat(price);
-    const stockNum = parseInt(stock, 10);
-    if (isNaN(priceNum) || isNaN(stockNum)) {
-      Alert.alert('Error', 'Price and stock must be valid numbers');
-      return;
-    }
-    const productData = {
-      name: name.trim(),
-      description: description.trim(),
-      price: priceNum,
-      categoryId: categoryId.trim(),
-      stock: stockNum,
-    };
-    if (editingProductId) {
-      editProduct(editingProductId, productData);
-    } else {
-      addProduct(productData);
-    }
-    setName('');
-    setDescription('');
-    setPrice('');
-    setCategoryId('');
-    setStock('');
-    setEditingProductId(null);
-    setModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    setName('');
-    setDescription('');
-    setPrice('');
-    setCategoryId('');
-    setStock('');
-    setEditingProductId(null);
-    setModalVisible(false);
+    navigation.push('CreateProduct', {
+      data: {
+        itemId: product.itemId,
+        product: {
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          categoryId: product.categoryId,
+          stock: product.stock,
+        },
+      },
+    });
   };
 
   const handleDeleteProduct = (id: string, name: string) => {
@@ -124,207 +82,77 @@ const ProductScreen = () => {
     navigation.navigate('ProductDetailScreen', { data: product });
   };
 
-  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const currentScrollY = event.nativeEvent.contentOffset.y;
-    if (currentScrollY <= 10) {
-      setIsAddButtonVisible(true);
-    } else {
-      setIsAddButtonVisible(currentScrollY < lastScrollY);
-    }
-    setLastScrollY(currentScrollY);
-  }, [lastScrollY]);
-
-  if (loading) {
-    return (
-      <View style={[globalStyles.contentContainer, styles.centered]}>
-        <Text style={styles.loadingText}>Loading...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={[globalStyles.contentContainer, styles.centered]}>
-        <Text style={styles.errorText}>Error: {error}</Text>
-        <TouchableOpacity
-          style={{ alignItems: 'center', marginTop: 60, backgroundColor: 'red', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10 }}
-          onPress={() => {
-            fetchProducts(true);
-            fetchCategories(true);
-          }}
-        >
-          <Text style={{ color: 'white', fontWeight: 'bold' }}>Try Again</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  if (products.length === 0) {
-    return (
-      <View style={[globalStyles.contentContainer, styles.centered]}>
-        <Text style={styles.noDataText}>No products available</Text>
-        <TouchableOpacity style={styles.addButton} onPress={handleAddProduct}>
-          <Ionicons name="add" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={handleCancel}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{editingProductId ? 'Edit Product' : 'Add New Product'}</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Product Name"
-                value={name}
-                onChangeText={setName}
-                autoFocus={true}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Product Description"
-                value={description}
-                onChangeText={setDescription}
-                multiline
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Price"
-                value={price}
-                onChangeText={setPrice}
-                keyboardType="numeric"
-              />
-              <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={categoryId}
-                  onValueChange={(value) => setCategoryId(value)}
-                  style={styles.picker}
-                >
-                  {categories.length > 0 ? (
-                    categories.map((category: Category) => (
-                      <Picker.Item key={category.id} label={category.name} value={category.id} />
-                    ))
-                  ) : (
-                    <Picker.Item label="No categories available" value="" />
-                  )}
-                </Picker>
-              </View>
-              <TextInput
-                style={styles.input}
-                placeholder="Stock"
-                value={stock}
-                onChangeText={setStock}
-                keyboardType="numeric"
-              />
-              <View style={styles.modalButtonContainer}>
-                <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={handleCancel}>
-                  <Text style={styles.modalButtonText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.modalButton, styles.addButtonModal]} onPress={handleSubmit}>
-                  <Text style={styles.modalButtonText}>{editingProductId ? 'Update' : 'Add'}</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.container}>
-      <ScrollView
-        style={globalStyles.scrollView}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[globalStyles.contentContainer, styles.scrollContent]}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-      >
-        <View style={styles.itemsContainer}>
-          {products.map((item) => (
-            <ProductCard
-              key={item.itemId}
-              product={item}
-              categories={categories}
-              onProductDetail={handleProductDetail}
-              onEditProduct={handleEditProduct}
-              onDeleteProduct={handleDeleteProduct}
-            />
-          ))}
-        </View>
-      </ScrollView>
-      {isAddButtonVisible && (
-        <TouchableOpacity style={styles.addButton} onPress={handleAddProduct}>
-          <Ionicons name="add" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-      )}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={handleCancel}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{editingProductId ? 'Edit Product' : 'Add New Product'}</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Product Name"
-              value={name}
-              onChangeText={setName}
-              autoFocus={true}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Product Description"
-              value={description}
-              onChangeText={setDescription}
-              multiline
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Price"
-              value={price}
-              onChangeText={setPrice}
-              keyboardType="numeric"
-            />
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={categoryId}
-                onValueChange={(value) => setCategoryId(value)}
-                style={styles.picker}
-              >
-                {categories.length > 0 ? (
-                  categories.map((category: Category) => (
-                    <Picker.Item key={category.id} label={category.name} value={category.id} />
-                  ))
-                ) : (
-                  <Picker.Item label="No categories available" value="" />
-                )}
-              </Picker>
-            </View>
-            <TextInput
-              style={styles.input}
-              placeholder="Stock"
-              value={stock}
-              onChangeText={setStock}
-              keyboardType="numeric"
-            />
-            <View style={styles.modalButtonContainer}>
-              <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={handleCancel}>
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalButton, styles.addButtonModal]} onPress={handleSubmit}>
-                <Text style={styles.modalButtonText}>{editingProductId ? 'Update' : 'Add'}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-    </View>
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const currentScrollY = event.nativeEvent.contentOffset.y;
+      setIsAddButtonVisible(currentScrollY <= 10 || currentScrollY < lastScrollY);
+      setLastScrollY(currentScrollY);
+    },
+    [lastScrollY]
   );
+
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <View style={[globalStyles.contentContainer, styles.centered]}>
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      );
+    }
+
+    if (error) {
+      return (
+        <View style={[globalStyles.contentContainer, styles.centered]}>
+          <Text style={styles.errorText}>Error: {error}</Text>
+          <TouchableOpacity
+            style={styles.tryAgainButton}
+            onPress={() => {
+              fetchProducts(true);
+              fetchCategories(true);
+            }}
+          >
+            <Text style={styles.tryAgainText}>Try Again</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
+    return (
+      <>
+        <ScrollView
+          style={globalStyles.scrollView}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={[globalStyles.contentContainer, styles.scrollContent]}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+        >
+          <View style={styles.itemsContainer}>
+            {products.length === 0 ? (
+              <Text style={styles.noDataText}>No products available</Text>
+            ) : (
+              products.map((item) => (
+                <ProductCard
+                  key={item.itemId}
+                  product={item}
+                  categories={categories}
+                  onProductDetail={handleProductDetail}
+                  onEditProduct={handleEditProduct}
+                  onDeleteProduct={handleDeleteProduct}
+                />
+              ))
+            )}
+          </View>
+        </ScrollView>
+        {isAddButtonVisible && (
+          <TouchableOpacity style={styles.addButton} onPress={handleAddProduct}>
+            <Ionicons name="add" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        )}
+      </>
+    );
+  };
+
+  return <View style={styles.container}>{renderContent()}</View>;
 };
 
 const styles = StyleSheet.create({
@@ -361,6 +189,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'gray',
   },
+  tryAgainButton: {
+    alignItems: 'center',
+    marginTop: 60,
+    backgroundColor: 'red',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  tryAgainText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
   addButton: {
     position: 'absolute',
     bottom: Platform.OS === 'ios' ? 100 : 80,
@@ -376,74 +216,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    width: '80%',
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 15,
-  },
-  input: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 15,
-    fontSize: 16,
-  },
-  pickerContainer: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    marginBottom: 15,
-  },
-  picker: {
-    width: '100%',
-    height: Platform.OS === 'ios' ? 150 : 50,
-  },
-  modalButtonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  modalButton: {
-    flex: 1,
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginHorizontal: 5,
-  },
-  cancelButton: {
-    backgroundColor: '#FF3B30',
-  },
-  addButtonModal: {
-    backgroundColor: '#007AFF',
-  },
-  modalButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
   },
 });
 
