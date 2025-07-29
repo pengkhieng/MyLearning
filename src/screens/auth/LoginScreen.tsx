@@ -103,11 +103,11 @@ const LoginScreen = () => {
                 <Text style={styles.title}>Welcome Back! 👋</Text>
                 <Text style={styles.subtitle}>Sign in to your account</Text>
 
-                <Text style={styles.label}>Username</Text>
+                <Text style={styles.label}>Username or Email</Text>
                 <View style={[globalStyles.inputContainer, isUsernameFocused && globalStyles.inputFocused]}>
                   <TextInput
                     style={[globalStyles.input, isUsernameFocused && { borderColor: colors.primary }]}
-                    placeholder="Username"
+                    placeholder="Username or Email"
                     placeholderTextColor={colors.placeholderTxt}
                     value={username}
                     onChangeText={setUsername}

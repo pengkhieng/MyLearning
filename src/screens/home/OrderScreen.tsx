@@ -24,6 +24,7 @@ import { Order } from '../../types/Order';
 import { Product } from '../../types/Product';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
+import OrderItem from '../../components/OrderItem'; // Import the new OrderItem component
 
 type OrderScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'OrderScreen'>;
 
@@ -281,48 +282,15 @@ const OrderScreen = () => {
         scrollEventThrottle={16}
       >
         {orders.map((order, index) => (
-          <View
+          <OrderItem
             key={order.id}
-            style={[
-              styles.itemContainer,
-              index % 2 === 0 ? styles.itemContainerEven : styles.itemContainerOdd,
-            ]}
-          >
-            <TouchableOpacity onPress={() => handleOrderDetail(order)}>
-              <View style={styles.itemContent}>
-                <View style={styles.textContainer}>
-                  <Text style={styles.itemTitle}>{order.name}</Text>
-                  <Text style={styles.itemDesc}>Address: {order.address}</Text>
-                  <Text style={styles.itemDesc}>Phone: {order.phone}</Text>
-                  <Text style={styles.itemDesc}>Status: {order.status}</Text>
-                  <Text style={styles.itemDesc}>
-                    Items: {order.items.map(item => `${item.itemName} (x${item.quantity})`).join(', ')}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.itemDesc,
-                      order.customTotalPrice > 0 ? { textDecorationLine: 'line-through', color: 'red' } : {},
-                    ]}
-                  >
-                    Total: ${order.totalAmount.toFixed(2)}
-                  </Text>
-                  {order.customTotalPrice > 0 && (
-                    <Text style={[styles.itemDesc, { color: 'green' }]}>
-                      Special Total Price: ${order.customTotalPrice.toFixed(2)}
-                    </Text>
-                  )}
-                </View>
-              </View>
-            </TouchableOpacity>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.editIcon} onPress={() => handleEditOrder(order)}>
-                <Ionicons name="pencil" size={24} color="#007AFF" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.deleteIcon} onPress={() => handleDeleteOrder(order.id, order.name)}>
-                <Ionicons name="trash" size={24} color="#FF3B30" />
-              </TouchableOpacity>
-            </View>
-          </View>
+            order={order}
+            index={index}
+            onEdit={handleEditOrder}
+            onDelete={handleDeleteOrder}
+            onDetail={handleOrderDetail}
+            navigation={navigation}
+          />
         ))}
       </ScrollView>
       {isAddButtonVisible && (
@@ -425,41 +393,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: 'relative',
-  },
-  itemContainer: {
-    padding: 12,
-    borderRadius: 6,
-    marginBottom: 8,
-    alignSelf: 'stretch',
-    minHeight: 70,
-  },
-  itemContainerEven: {
-    backgroundColor: 'rgba(255, 145, 0, 0.1)', // Light orange
-  },
-  itemContainerOdd: {
-    backgroundColor: 'rgba(0, 128, 0, 0.1)', // Light green
-  },
-  itemContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  textContainer: {
-    flex: 1,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  itemTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'black',
-  },
-  itemDesc: {
-    fontSize: 14,
-    color: '#555',
-    marginTop: 4,
   },
   centered: {
     flex: 1,
@@ -593,11 +526,5 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
-  },
-  editIcon: {
-    padding: 8,
-  },
-  deleteIcon: {
-    padding: 8,
   },
 });
