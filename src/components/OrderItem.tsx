@@ -36,7 +36,7 @@ const OrderItem: React.FC<OrderItemProps> = ({
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
         {
-          options: ['Cancel', 'View Details', 'Edit', 'Delete'],
+          options: ['Cancel', 'Edit', 'Delete'],
           destructiveButtonIndex: 3,
           cancelButtonIndex: 0,
           title: order.name?.trim() || 'Unnamed Order',

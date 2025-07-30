@@ -35,7 +35,7 @@ const ProductScreen: React.FC = () => {
     useCallback(() => {
       fetchProducts(true);
       fetchCategories(true);
-      return () => {};
+      return () => { };
     }, [fetchProducts, fetchCategories])
   );
 
@@ -53,6 +53,7 @@ const ProductScreen: React.FC = () => {
           price: product.price,
           categoryId: product.categoryId,
           stock: product.stock,
+          imageUrl: product.imageUrl
         },
       },
     });

@@ -8,8 +8,8 @@ import {
     TouchableOpacity,
     Platform,
     Alert,
-    Image,
     TextInput,
+    ImageBackground,
 } from 'react-native';
 import { useNavigation, RouteProp } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker';
@@ -19,6 +19,8 @@ import { useCategories } from '../../hooks/useCategories';
 import { useUploadImage } from '../../hooks/useUploadImage';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import CustomButton from '../../components/CustomButton';
+import { colors } from '../../utils/colors';
+import { globalStyles } from '../../style/globalStyles';
 
 type CreateCategoryScreenRouteProp = RouteProp<RootStackParamList, 'CreateCategory'>;
 
@@ -35,6 +37,9 @@ const CreateCategory: React.FC<CreateCategoryScreenProps> = ({ route }) => {
     const [productType, setProductType] = useState(category?.category.name || '');
     const [desc, setDesc] = useState(category?.category.description || '');
     const [imageUri, setImageUri] = useState<string | null>(category?.imageUrl || null);
+
+    const [isProductType, setIsProductType] = useState(false);
+    const [isDesc, setIsDesc] = useState(false);
 
     const handleImagePick = () => {
         launchImageLibrary({ mediaType: 'photo', quality: 1 }, (response) => {
@@ -89,39 +94,67 @@ const CreateCategory: React.FC<CreateCategoryScreenProps> = ({ route }) => {
                     <Ionicons name="chevron-back" size={24} color="#000" />
                 </TouchableOpacity>
                 <Text style={styles.title}>{category?.id ? 'Edit Category' : 'Create Category'}</Text>
-                <Text style={{width:30}}></Text>
+                <Text style={{ width: 30 }}></Text>
             </View>
-
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.contentContainer}>
-                <TextInput
-                    style={styles.input}
-                    value={productType}
-                    onChangeText={setProductType}
-                    placeholder="Category Name"
-                    autoFocus
-                />
-                <TextInput
-                    style={[styles.input, styles.descriptionInput]}
-                    value={desc}
-                    onChangeText={setDesc}
-                    placeholder="Description (optional)"
-                    multiline
-                />
+                <View style={styles.label}>
+                    <Text>Category Name </Text>
+                    <Text style={styles.required}>*</Text>
+                </View>
+                <View style={[globalStyles.inputContainer, isProductType && globalStyles.inputFocused]}>
+                    <TextInput
+                        style={[globalStyles.input, isProductType && { borderColor: colors.primary }]}
+                        placeholder="Category Name"
+                        placeholderTextColor={colors.placeholderTxt}
+                        value={productType}
+                        onChangeText={setProductType}
+                        keyboardType="default"
+                        autoCapitalize="none"
+                        onFocus={() => setIsProductType(true)}
+                        onBlur={() => setIsProductType(false)}
+                    />
+                </View>
+                <Text style={styles.label}>Description (optional)</Text>
+                <View
+                    style={[
+                        globalStyles.inputContainer,
+                        isDesc && globalStyles.inputFocused,
+                        { height: 100 },
+                    ]}
+                >
+                    <TextInput
+                        style={[
+                            globalStyles.input,
+                            { height: 95 },
+                            isDesc && { borderColor: colors.primary },
+                        ]}
+                        placeholder="Description (optional)"
+                        placeholderTextColor={colors.placeholderTxt}
+                        value={desc}
+                        onChangeText={setDesc}
+                        keyboardType="default"
+                        autoCapitalize="none"
+                        onFocus={() => setIsDesc(true)}
+                        onBlur={() => setIsDesc(false)}
+                        multiline
+                    />
+                </View>
+
                 <TouchableOpacity style={styles.imageContainer} onPress={handleImagePick}>
-                    {imageUri ? (
-                        <Image source={{ uri: imageUri }} style={styles.image} />
-                    ) : (
-                        <Image source={require('../../assets/images/image_empty.png')} style={styles.image} />
-                    )}
-                    <Text style={styles.imageText}>{imageUri ? 'Change Image' : 'Choose Image (Optional)'}</Text>
+                    <ImageBackground
+                        source={imageUri ? { uri: imageUri } : require('../../assets/images/image_empty.png')}
+                        style={styles.image}
+                        resizeMode="cover"
+                    >
+                        <Text style={styles.imageText}>{imageUri ? 'Change Image' : 'Choose Image (Optional)'}</Text>
+                    </ImageBackground>
                 </TouchableOpacity>
-                {imageUri && <Text style={styles.imageSelectedText}>Image selected</Text>}
                 <CustomButton
                     title={uploadLoading ? (category?.id ? 'Update...' : 'Create...') : (category?.id ? 'Update' : 'Create')}
                     onPress={handleSubmit}
                     animation="pulse"
                     duration={200}
-                    isDisabled={uploadLoading}
+                    isDisabled={uploadLoading || productType == ""}
                     buttonStyle={styles.button}
                 />
             </ScrollView>
@@ -179,44 +212,45 @@ const styles = StyleSheet.create({
         paddingTop: 10,
     },
     imageContainer: {
+        marginBottom: 16,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowRadius: 8,
+        elevation: 0,
+        borderWidth: 2,
+        borderColor: 'rgba(145, 99, 99, 0.25)',
+        paddingHorizontal: 16,
         alignItems: 'center',
-        marginBottom: 15,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
         padding: 10,
-        backgroundColor: '#fff',
+        position: 'relative',
     },
     image: {
         width: 200,
         height: 200,
-        resizeMode: 'contain',
-    },
-    imageText: {
-        marginTop: 10,
-        color: '#007AFF',
-        fontSize: 16,
-    },
-    imageSelectedText: {
-        fontSize: 14,
-        color: 'green',
-        marginBottom: 15,
-        textAlign: 'center',
-    },
-    updateButton: {
-        backgroundColor: '#4CAF50',
-        padding: 12,
-        borderRadius: 5,
+        justifyContent: 'center',
         alignItems: 'center',
     },
-    disabledButton: {
-        backgroundColor: '#cccccc',
-        opacity: 0.6,
-    },
-    updateButtonText: {
-        color: '#fff',
-        fontWeight: 'bold',
+    imageText: {
+        color: 'black',
+        fontWeight: '600',
         fontSize: 16,
+        textAlign: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 10
+    },
+    label: {
+        marginBottom: 10,
+        color: "black",
+        fontSize: 16,
+        flexDirection: 'row', alignItems: 'center'
+    },
+    required: {
+        marginLeft: 2,
+        color: 'red',
     },
     button: {
         marginBottom: 10,

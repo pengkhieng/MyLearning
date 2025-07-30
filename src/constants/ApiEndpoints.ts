@@ -15,7 +15,7 @@ export class ApiEndpoints {
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
 
-    
+
   };
 
   static readonly USER = {
@@ -66,4 +66,11 @@ export class KKey {
   static ORDER = 'orders';
   static CATEGORY = 'categories';
   static PRODUCT = 'products';
+}
+
+export class SPACER {
+ static IMAGE_SIZE = 200;
+ static INPUT_HEIGHT = 40;
+ static DESCRIPTION_HEIGHT = 80;
+ static EMPTY_IMAGE = require('../assets/images/image_empty.png');
 }

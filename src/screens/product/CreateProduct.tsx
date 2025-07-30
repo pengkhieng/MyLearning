@@ -8,11 +8,11 @@ import {
   TouchableOpacity,
   Platform,
   Alert,
-  Image,
+  ImageBackground,
   TextInput,
 } from 'react-native';
 import { useNavigation, RouteProp } from '@react-navigation/native';
-import { Picker } from '@react-native-picker/picker';
+import DropDownPicker from 'react-native-dropdown-picker';
 import { launchImageLibrary } from 'react-native-image-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { RootStackParamList } from '../../navigation/AppNavigator';
@@ -22,6 +22,25 @@ import { useUploadImage } from '../../hooks/useUploadImage';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Category } from '../../types/CategoryType';
 import CustomButton from '../../components/CustomButton';
+import { SPACER } from '../../constants/ApiEndpoints';
+import { globalStyles } from '../../style/globalStyles';
+import { colors } from '../../utils/colors';
+
+interface Product {
+  name: string;
+  description: string;
+  price: number;
+  categoryId: string;
+  stock: number;
+  imageUrl?: string | null;
+}
+
+type RouteParams = {
+  data?: {
+    itemId: string;
+    product: Product;
+  };
+};
 
 type CreateProductScreenRouteProp = RouteProp<RootStackParamList, 'CreateProduct'>;
 
@@ -30,31 +49,53 @@ interface CreateProductScreenProps {
 }
 
 const CreateProduct: React.FC<CreateProductScreenProps> = ({ route }) => {
-  const { data: product, imageUrl } = route.params || {};
+  const { data } = route.params as RouteParams;
+  const initialProduct = data?.product || {
+    name: '',
+    description: '',
+    price: 0,
+    categoryId: '',
+    stock: 0,
+    imageUrl: null,
+  };
+
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { addProduct, editProduct } = useProducts();
   const { categories } = useCategories();
   const { uploadImage, loading: uploadLoading, error: uploadError } = useUploadImage();
 
-  const [name, setName] = useState(product?.product.name || '');
-  const [description, setDescription] = useState(product?.product.description || '');
-  const [price, setPrice] = useState(product?.product.price ? product.product.price.toString() : '');
-  const [categoryId, setCategoryId] = useState(product?.product.categoryId || (categories.length > 0 ? categories[0].id : ''));
-  const [stock, setStock] = useState(product?.product.stock ? product.product.stock.toString() : '');
-  const [imageUri, setImageUri] = useState<string | null>(imageUrl || null);
+  const [formData, setFormData] = useState({
+    name: initialProduct.name,
+    description: initialProduct.description,
+    price: initialProduct.price.toString(),
+    categoryId: initialProduct.categoryId || categories[0]?.id || '',
+    stock: initialProduct.stock.toString(),
+  });
+  const [imageUri, setImageUri] = useState<string | null>(initialProduct.imageUrl || null);
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [isDesc, setIsDesc] = useState(false);
+  const [isName, setIsName] = useState(false);
+  const [isPrice, setIsPrice] = useState(false);
+  const [isStock, setIsStock] = useState(false);
+
+
 
   const handleImagePick = () => {
     launchImageLibrary({ mediaType: 'photo', quality: 1 }, (response) => {
       if (response.didCancel) return;
       if (response.errorCode) {
         Alert.alert('Error', `Image picker error: ${response.errorMessage}`);
-      } else if (response.assets?.[0]?.uri) {
+        return;
+      }
+      if (response.assets?.[0]?.uri) {
         setImageUri(response.assets[0].uri);
       }
     });
   };
 
   const handleSubmit = async () => {
+    const { name, price, categoryId, stock } = formData;
+
     if (!name.trim() || !price.trim() || !categoryId.trim() || !stock.trim()) {
       Alert.alert('Error', 'Name, price, category, and stock are required');
       return;
@@ -68,34 +109,37 @@ const CreateProduct: React.FC<CreateProductScreenProps> = ({ route }) => {
     }
 
     try {
-      let imageUrl: string | undefined;
+      let imageUrl: string | null | undefined;
       if (imageUri) {
-        const uploadedUrl = await uploadImage(imageUri);
-        if (!uploadedUrl) {
+        imageUrl = await uploadImage(imageUri);
+        if (!imageUrl) {
           Alert.alert('Error', uploadError || 'Please check that your image size is under 3MB.');
           return;
         }
-        imageUrl = uploadedUrl;
       }
 
-      const productData = {
+      const productData: Product = {
         name: name.trim(),
-        description: description.trim(),
+        description: formData.description.trim(),
         price: priceNum,
         categoryId: categoryId.trim(),
         stock: stockNum,
       };
 
-      if (product?.itemId) {
-        await editProduct(product.itemId, productData, imageUrl);
+      if (data?.itemId) {
+        await editProduct(data.itemId, productData, imageUrl ?? '');
       } else {
-        await addProduct(productData, imageUrl);
+        await addProduct(productData, imageUrl ?? '');
       }
 
       navigation.goBack();
     } catch (err: any) {
       Alert.alert('Error', err.message || 'Failed to save product');
     }
+  };
+
+  const updateFormData = (field: keyof typeof formData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -105,65 +149,133 @@ const CreateProduct: React.FC<CreateProductScreenProps> = ({ route }) => {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.title}>{product?.itemId ? 'Edit Product' : 'Create Product'}</Text>
-        <Text style={{width:30}}></Text>
+        <Text style={styles.title}>{data?.itemId ? 'Edit Product' : 'Create Product'}</Text>
+        <View style={{ width: 30 }} />
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.contentContainer}>
-        <TextInput
-          style={styles.input}
-          value={name}
-          onChangeText={setName}
-          placeholder="Product Name"
-          autoFocus
-        />
-        <TextInput
-          style={[styles.input, styles.descriptionInput]}
-          value={description}
-          onChangeText={setDescription}
-          placeholder="Product Description (optional)"
-          multiline
-        />
-        <TextInput
-          style={styles.input}
-          value={price}
-          onChangeText={setPrice}
-          placeholder="Price"
-          keyboardType="numeric"
-        />
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={categoryId}
-            onValueChange={(value) => setCategoryId(value)}
-            style={styles.picker}
-          >
-            {categories.length > 0 ? (
-              categories.map((category: Category) => (
-                <Picker.Item key={category.id} label={category.name} value={category.id} />
-              ))
-            ) : (
-              <Picker.Item label="No categories available" value="" />
-            )}
-          </Picker>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.contentContainer}
+        nestedScrollEnabled={true}
+      >
+        <View style={styles.label}>
+          <Text>Product Name </Text>
+          <Text style={styles.required}>*</Text>
         </View>
-        <TextInput
-          style={styles.input}
-          value={stock}
-          onChangeText={setStock}
-          placeholder="Stock"
-          keyboardType="numeric"
-        />
+        <View style={[globalStyles.inputContainer, isName && globalStyles.inputFocused]}>
+          <TextInput
+            style={[globalStyles.input, isName && { borderColor: colors.primary }]}
+            placeholder="Product Name"
+            placeholderTextColor={colors.placeholderTxt}
+            value={formData.name}
+            onChangeText={(text) => updateFormData('name', text)}
+            keyboardType="default"
+            autoCapitalize="none"
+            onFocus={() => setIsName(true)}
+            onBlur={() => setIsName(false)}
+          />
+        </View>
+        <Text style={styles.label}>Description (optional)</Text>
+
+        <View
+          style={[
+            globalStyles.inputContainer,
+            isDesc && globalStyles.inputFocused,
+            { height: 100 },
+          ]}
+        >
+          <TextInput
+            style={[
+              globalStyles.input,
+              { height: 95 },
+              isDesc && { borderColor: colors.primary },
+            ]}
+            placeholder="Description (optional)"
+            placeholderTextColor={colors.placeholderTxt}
+            value={formData.description}
+            onChangeText={(text) => updateFormData('description', text)}
+            keyboardType="default"
+            autoCapitalize="none"
+            onFocus={() => setIsDesc(true)}
+            onBlur={() => setIsDesc(false)}
+            multiline
+          />
+        </View>
+
+        <View style={styles.label}>
+          <Text>Price </Text>
+          <Text style={styles.required}>*</Text>
+        </View>
+        <View style={[globalStyles.inputContainer, isPrice && globalStyles.inputFocused]}>
+          <TextInput
+            style={[globalStyles.input, isPrice && { borderColor: colors.primary }]}
+            placeholder="Product Price"
+            placeholderTextColor={colors.placeholderTxt}
+            value={formData.price}
+            onChangeText={(text) => updateFormData('price', text)}
+            keyboardType='numeric'
+            autoCapitalize="none"
+            onFocus={() => setIsPrice(true)}
+            onBlur={() => setIsPrice(false)}
+          />
+        </View>
+        <View style={styles.pickerContainer}>
+          <DropDownPicker
+            open={isPickerOpen}
+            value={formData.categoryId}
+            items={categories.map((category: Category) => ({
+              label: category.name,
+              value: category.id,
+            }))}
+            setOpen={setIsPickerOpen}
+            setValue={(callback) => {
+              const value = callback(formData.categoryId);
+              updateFormData('categoryId', value);
+            }}
+            placeholder="Select a category"
+            style={styles.picker}
+            dropDownContainerStyle={styles.dropDownContainer}
+            listMode="SCROLLVIEW"
+          />
+        </View>
+        <View style={styles.label}>
+          <Text>Stock </Text>
+          <Text style={styles.required}>*</Text>
+        </View>
+        <View style={[globalStyles.inputContainer, isStock && globalStyles.inputFocused]}>
+          <TextInput
+            style={[globalStyles.input, isStock && { borderColor: colors.primary }]}
+            placeholder="Stock"
+            placeholderTextColor={colors.placeholderTxt}
+            value={formData.stock}
+            onChangeText={(text) => updateFormData('stock', text)}
+            keyboardType='number-pad'
+            autoCapitalize="none"
+            onFocus={() => setIsStock(true)}
+            onBlur={() => setIsStock(false)}
+          />
+        </View>
         <TouchableOpacity style={styles.imageContainer} onPress={handleImagePick}>
-          {imageUri ? (
-            <Image source={{ uri: imageUri }} style={styles.image} />
-          ) : (
-            <Image source={require('../../assets/images/image_empty.png')} style={styles.image} />
-          )}
-          <Text style={styles.imageText}>{imageUri ? 'Change Image' : 'Choose Image (Optional)'}</Text>
+          <ImageBackground
+            source={imageUri ? { uri: imageUri } : SPACER.EMPTY_IMAGE}
+            style={styles.image}
+            resizeMode="cover"
+          >
+            <Text style={styles.imageText}>
+              {imageUri ? 'Change Image' : 'Choose Image (Optional)'}
+            </Text>
+          </ImageBackground>
         </TouchableOpacity>
-        {imageUri && <Text style={styles.imageSelectedText}>Image selected</Text>}
         <CustomButton
-          title={uploadLoading ? (product?.itemId ? 'Updating...' : 'Creating...') : (product?.itemId ? 'Update' : 'Create')}
+          title={
+            uploadLoading
+              ? data?.itemId
+                ? 'Updating...'
+                : 'Creating...'
+              : data?.itemId
+                ? 'Update'
+                : 'Create'
+          }
           onPress={handleSubmit}
           animation="pulse"
           duration={200}
@@ -210,7 +322,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   input: {
-    height: 40,
+    height: SPACER.INPUT_HEIGHT,
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,
@@ -220,46 +332,80 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   descriptionInput: {
-    height: 80,
+    height: SPACER.DESCRIPTION_HEIGHT,
     textAlignVertical: 'top',
     paddingTop: 10,
   },
   pickerContainer: {
+    marginBottom: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 8,
+    elevation: 0,
+    borderWidth: 2,
+    borderColor: 'rgba(145, 99, 99, 0.25)',
     width: '100%',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    marginBottom: 15,
-    backgroundColor: '#fff',
+    paddingBottom: 10,
+    zIndex: 5
   },
   picker: {
-    width: '100%',
-    height: Platform.OS === 'ios' ? 150 : 50,
+    borderWidth: 0,
+    height: SPACER.INPUT_HEIGHT,
+    zIndex: 10,
+  },
+  dropDownContainer: {
+    marginBottom: 16,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 8,
+    elevation: 0,
+    borderWidth: 2,
+    borderColor: 'rgba(145, 99, 99, 0.6)',
+    marginTop: 6,
+    backgroundColor: '#fff',
+    zIndex: 100
   },
   imageContainer: {
+    marginBottom: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 8,
+    elevation: 0,
+    borderWidth: 2,
+    borderColor: 'rgba(145, 99, 99, 0.25)',
     alignItems: 'center',
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
     padding: 10,
-    backgroundColor: '#fff',
   },
   image: {
-    width: 200,
-    height: 200,
-    resizeMode: 'contain',
+    width: SPACER.IMAGE_SIZE,
+    height: SPACER.IMAGE_SIZE,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   imageText: {
-    marginTop: 10,
-    color: '#007AFF',
+    color: 'black',
+    fontWeight: '600',
     fontSize: 16,
-  },
-  imageSelectedText: {
-    fontSize: 14,
-    color: 'green',
-    marginBottom: 15,
     textAlign: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+  },
+  label: {
+    marginBottom: 10,
+    color: "black",
+    fontSize: 16,
+    flexDirection: 'row', alignItems: 'center'
+  },
+  required: {
+    marginLeft: 2,
+    color: 'red',
   },
   button: {
     marginBottom: 10,

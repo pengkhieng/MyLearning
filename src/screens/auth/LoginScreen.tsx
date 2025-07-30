@@ -137,10 +137,6 @@ const LoginScreen = () => {
                   <Text style={[styles.forgotPasswordText]}>Forgot Password?</Text>
                 </TouchableOpacity>
 
-
-                {error && <Text style={styles.error}>{error}</Text>}
-                {data && <Text style={styles.success}>{data.message}</Text>}
-
                 <CustomButton
                   title={loading ? 'Signing In...' : 'Sign In'}
                   onPress={handleLogin}

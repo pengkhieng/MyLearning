@@ -48,7 +48,7 @@ export type RootStackParamList = {
   ProductDetailScreen: { data: Product }
   ProductScreen: undefined;
   CreateProduct: {
-    data?: { itemId: string; product: { name: string; description: string; price: number; categoryId: string; stock: number } },
+    data?: { itemId: string; product: { name: string; description: string; price: number; categoryId: string; stock: number,imageUrl?: string } },
     imageUrl?: string
   };
 };
